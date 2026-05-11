@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  listings Listing[]
+  // We'll add messages and profile later
+}
+
+model Listing {
+  id          String   @id @default(cuid())
+  title       String
+  brand       String
+  size        String
+  color       String?
+  condition   String   // New, Like New, Good, Worn
+  price       Decimal
+  description String?
+  images      String[] // Array of image URLs
+  weight      String?  // e.g., "450gsm"
+  isSold      Boolean  @default(false)
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

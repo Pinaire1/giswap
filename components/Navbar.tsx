@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X, Shirt } from "lucide-react";
+import { signIn, signOut, useSession } from "next-auth/react";
+import { Shirt, LogOut } from "lucide-react";
+import Image from "next/image";
 
 export default function Navbar() {
+  const { data: session, status } = useSession();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -30,28 +33,59 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Auth Buttons */}
+          {/* Auth Section */}
           <div className="hidden md:flex items-center gap-4">
-            <Link
-              href="/login"
-              className="px-4 py-2 text-sm font-medium hover:bg-gray-100 rounded-md transition"
-            >
-              Log in
-            </Link>
-            <Link
-              href="/register"
-              className="px-5 py-2 text-sm font-medium bg-orange-600 text-white rounded-md hover:bg-orange-700 transition"
-            >
-              Sign up
-            </Link>
+            {status === "loading" && <div>Loading...</div>}
+
+            {session ? (
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  {session.user?.image ? (
+                    <Image
+                      src={session.user.image}
+                      alt="Profile"
+                      width={32}
+                      height={32}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 bg-gray-300 rounded-full" />
+                  )}
+                  <span className="text-sm font-medium">{session.user?.name}</span>
+                </div>
+
+                <button
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition"
+                >
+                  <LogOut size={18} />
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <>
+                <button
+                  onClick={() => signIn("google")}
+                  className="px-4 py-2 text-sm font-medium hover:bg-gray-100 rounded-md transition"
+                >
+                  Log in
+                </button>
+                <button
+                  onClick={() => signIn("google")}
+                  className="px-5 py-2 text-sm font-medium bg-orange-600 text-white rounded-md hover:bg-orange-700 transition"
+                >
+                  Sign up
+                </button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden"
+            className="md:hidden text-2xl"
           >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
+            {isOpen ? "✕" : "☰"}
           </button>
         </div>
 
@@ -61,12 +95,22 @@ export default function Navbar() {
             <Link href="/listings" className="py-2">Browse Gis</Link>
             <Link href="/listings/new" className="py-2">Sell Your Gi</Link>
             <Link href="/dashboard" className="py-2">Dashboard</Link>
-            <div className="pt-4 border-t flex flex-col gap-3">
-              <Link href="/login" className="py-2">Log in</Link>
-              <Link href="/register" className="py-2 bg-orange-600 text-white text-center rounded-md">
-                Sign up
-              </Link>
-            </div>
+            
+            {session ? (
+              <button
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className="py-2 text-red-600 text-left"
+              >
+                Logout
+              </button>
+            ) : (
+              <button
+                onClick={() => signIn("google")}
+                className="py-2 text-left"
+              >
+                Sign in
+              </button>
+            )}
           </div>
         )}
       </div>

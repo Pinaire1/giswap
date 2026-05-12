@@ -5,7 +5,12 @@ import Google from "next-auth/providers/google";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
-  providers: [Google],
+  providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+  ],
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
@@ -13,5 +18,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: true,
 });
 
-// ✅ This is the important part - must be at the bottom
 export const { GET, POST } = handlers;

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { SessionProvider } from "next-auth/react";
+import "@uploadthing/react/styles.css";
 
 export const metadata: Metadata = {
   title: "GiSwap | BJJ Gi Marketplace",

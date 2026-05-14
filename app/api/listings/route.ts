@@ -2,16 +2,31 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 
+export async function GET() {
+  try {
+    const listings = await prisma.listing.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        user: {
+          select: { name: true, image: true }
+        }
+      }
+    });
+
+    return NextResponse.json(listings);
+  } catch (error) {
+    console.error("Failed to fetch listings:", error);
+    return NextResponse.json([], { status: 500 });
+  }
+}
+
+// Keep your existing POST function below
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
-    console.log("Session in API:", session); // ← Very important for debugging
 
     if (!session?.user?.id) {
-      console.error("No user ID in session:", session);
-      return NextResponse.json({ 
-        error: "Unauthorized - No user session found" 
-      }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -29,13 +44,9 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    console.log("✅ Listing created:", listing.id);
     return NextResponse.json({ success: true, listing });
-
-  } catch (error: any) {
-    console.error("Full error:", error);
-    return NextResponse.json({ 
-      error: error.message || "Failed to create listing" 
-    }, { status: 500 });
+  } catch (error) {
+    console.error("Create listing error:", error);
+    return NextResponse.json({ error: "Failed to create listing" }, { status: 500 });
   }
 }

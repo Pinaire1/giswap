@@ -1,10 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { UploadButton } from "@/lib/uploadthing";
-import Image from "next/image";
 
 export default function NewListingPage() {
   const { data: session, status } = useSession();
@@ -59,17 +60,29 @@ export default function NewListingPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-12">
-      <h1 className="text-4xl font-bold mb-8 text-white">Sell Your Gi</h1>
+      <motion.h1 
+        initial={{ opacity: 0, y: -40 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-6xl font-black mb-3 text-white tracking-tighter"
+      >
+        Post Your Gi
+      </motion.h1>
+      <p className="text-emerald-400 text-xl mb-12">Let it roll again</p>
 
-      <form onSubmit={handleSubmit} className="space-y-8 bg-zinc-900 p-8 rounded-3xl border border-zinc-800">
+      <motion.form 
+        onSubmit={handleSubmit} 
+        className="space-y-8 bg-zinc-900 p-10 rounded-3xl border border-zinc-800"
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <div>
+          <label className="block text-sm font-medium mb-2 text-gray-200">Brand</label>
+          <input name="brand" type="text" className="w-full p-4 bg-zinc-800 border border-zinc-700 rounded-2xl text-white" placeholder="Shoyoroll, Tatami..." required />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium mb-2 text-gray-300">Brand</label>
-            <input name="brand" type="text" className="w-full p-4 bg-zinc-800 border border-zinc-700 rounded-2xl text-white" placeholder="Shoyoroll, Tatami..." required />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2 text-gray-300">Size</label>
+            <label className="block text-sm font-medium mb-2 text-gray-200">Size</label>
             <select name="size" className="w-full p-4 bg-zinc-800 border border-zinc-700 rounded-2xl text-white" required>
               <option value="">Select Size</option>
               {["A0","A1","A2","A3","A4","A5","A6"].map(s => (
@@ -79,43 +92,35 @@ export default function NewListingPage() {
           </div>
         </div>
 
-                <div>
+        <div>
           <label className="block text-sm font-medium mb-2 text-gray-200">Condition</label>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {["New", "Like New", "Good", "Worn"].map((cond) => (
-              <label 
+              <motion.label 
                 key={cond} 
-                className="border border-zinc-600 bg-zinc-800 hover:bg-zinc-700 hover:border-emerald-500 rounded-2xl p-4 cursor-pointer text-center transition-all text-white font-medium"
+                whileHover={{ scale: 1.08, borderColor: "#10b981" }}
+                whileTap={{ scale: 0.95 }}
+                className="border-2 border-zinc-600 bg-zinc-800 hover:bg-zinc-700 rounded-2xl p-5 cursor-pointer text-center transition-all text-white font-medium"
               >
                 <input type="radio" name="condition" value={cond} required className="mr-2 accent-emerald-500" />
                 {cond}
-              </label>
+              </motion.label>
             ))}
           </div>
         </div>
 
         <div>
           <label className="block text-sm font-medium mb-2 text-gray-200">Price ($)</label>
-          <input 
-            name="price" 
-            type="number" 
-            className="w-full p-4 bg-zinc-800 border border-zinc-600 rounded-2xl text-white placeholder:text-gray-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500" 
-            placeholder="150" 
-            required 
-          />
+          <input name="price" type="number" className="w-full p-4 bg-zinc-800 border border-zinc-700 rounded-2xl text-white" placeholder="150" required />
         </div>
 
         <div>
           <label className="block text-sm font-medium mb-2 text-gray-200">Description</label>
-          <textarea 
-            name="description" 
-            className="w-full p-4 bg-zinc-800 border border-zinc-600 rounded-3xl h-32 text-white placeholder:text-gray-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500" 
-            placeholder="How many times used, any repairs, rips, etc..." 
-          />
+          <textarea name="description" className="w-full p-4 bg-zinc-800 border border-zinc-700 rounded-3xl h-32 text-white" placeholder="How many times used, any repairs, etc..." />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-4 text-gray-300">Upload Photos (max 5)</label>
+          <label className="block text-sm font-medium mb-4 text-gray-200">Upload Photos (max 5)</label>
           <UploadButton
             endpoint="giImageUploader"
             onClientUploadComplete={(res) => {
@@ -123,33 +128,35 @@ export default function NewListingPage() {
               setUploadedImages((prev) => [...prev, ...urls]);
             }}
             onUploadError={(error: Error) => alert(`Upload failed: ${error.message}`)}
-            className="ut-button:bg-emerald-600 ut-button:hover:bg-emerald-700 ut-button:text-white"
+            className="ut-button:bg-emerald-600 ut-button:hover:bg-emerald-700"
           />
         </div>
 
-{uploadedImages.length > 0 && (
-  <div className="flex flex-wrap gap-4">
-    {uploadedImages.map((url, i) => (
-      <Image 
-        key={i} 
-        src={url} 
-        alt={`uploaded ${i}`}
-        width={112}
-        height={112}
-        className="object-cover rounded-2xl border border-zinc-700"
-      />
-    ))}
-  </div>
-)}
+        {uploadedImages.length > 0 && (
+          <div className="flex flex-wrap gap-4">
+            {uploadedImages.map((url, i) => (
+              <Image
+                key={i}
+                src={url}
+                alt="uploaded"
+                width={112}
+                height={112}
+                className="w-28 h-28 object-cover rounded-2xl border border-emerald-900"
+              />
+            ))}
+          </div>
+        )}
 
-        <button
+        <motion.button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl font-medium text-lg transition disabled:opacity-50"
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.96 }}
+          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-5 rounded-2xl font-bold text-xl tracking-wider transition disabled:opacity-50"
         >
-          {isSubmitting ? "Posting Gi..." : "Post Gi for Sale"}
-        </button>
-      </form>
+          {isSubmitting ? "THROWING ON THE MAT..." : "POST TO THE MAT"}
+        </motion.button>
+      </motion.form>
     </div>
   );
 }

@@ -63,7 +63,7 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Hamburger */}
           <button 
             onClick={() => setIsOpen(!isOpen)} 
             className="md:hidden text-white text-3xl focus:outline-none"
@@ -74,34 +74,34 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden py-6 border-t border-zinc-800 bg-zinc-950">
-            <div className="flex flex-col gap-6 text-white">
-              <Link href="/listings" className="hover:text-emerald-400" onClick={() => setIsOpen(false)}>
+          <div className="md:hidden py-8 border-t border-zinc-800 bg-zinc-950">
+            <div className="flex flex-col gap-6 text-lg text-white">
+              <Link href="/listings" onClick={() => setIsOpen(false)} className="hover:text-emerald-400">
                 Browse Gis
               </Link>
-              <Link href="/listings/new" className="hover:text-emerald-400" onClick={() => setIsOpen(false)}>
+              <Link href="/listings/new" onClick={() => setIsOpen(false)} className="hover:text-emerald-400">
                 Sell Your Gi
               </Link>
-              <Link href="/dashboard" className="hover:text-emerald-400" onClick={() => setIsOpen(false)}>
+              <Link href="/dashboard" onClick={() => setIsOpen(false)} className="hover:text-emerald-400">
                 Dashboard
               </Link>
 
-              <div className="pt-4 border-t border-zinc-800">
+              <div className="pt-6 border-t border-zinc-800">
                 {session ? (
                   <button
                     onClick={() => {
                       signOut({ callbackUrl: "/" });
                       setIsOpen(false);
                     }}
-                    className="text-red-400 hover:text-red-500 flex items-center gap-2"
+                    className="flex items-center gap-3 text-red-400 hover:text-red-500"
                   >
-                    <LogOut size={20} />
+                    <LogOut size={22} />
                     Logout
                   </button>
                 ) : (
                   <button
                     onClick={() => signIn("google")}
-                    className="w-full text-left py-2 hover:text-emerald-400"
+                    className="w-full text-left py-3 hover:text-emerald-400"
                   >
                     Sign in with Google
                   </button>

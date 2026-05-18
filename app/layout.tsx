@@ -16,15 +16,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-gray-50 font-sans antialiased">
+      <body className="min-h-screen tatami-bg font-sans antialiased">
         <SessionProvider>
           <Navbar />
           <main className="min-h-[calc(100vh-64px)]">
             {children}
           </main>
-          <footer className="bg-gray-900 text-gray-400 py-8 mt-12">
-            <div className="max-w-7xl mx-auto px-6 text-center">
-              <p>© 2026 GiSwap • Built for the BJJ Community</p>
+          <footer className="bg-zinc-950 border-t border-zinc-800 text-gray-400 py-10 mt-12">
+            <div className="max-w-7xl mx-auto px-6 text-center space-y-2">
+              <p className="text-emerald-500 font-bold text-lg tracking-widest uppercase">
+                GiSwap
+              </p>
+              <p className="text-sm">© 2026 GiSwap • Built for the BJJ Community</p>
+              <p className="text-xs text-zinc-600 mt-2">
+                OSS · No Ego · Keep Rolling
+              </p>
             </div>
           </footer>
         </SessionProvider>

@@ -3,9 +3,6 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -23,4 +20,131 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* =====================
+   BJJ TEXTURES
+   ===================== */
+
+/* Tatami mat — page backgrounds */
+.tatami-bg {
+  background-color: #0a0a0a;
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 12px,
+      rgba(255,255,255,0.018) 12px,
+      rgba(255,255,255,0.018) 13px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 12px,
+      rgba(255,255,255,0.018) 12px,
+      rgba(255,255,255,0.018) 13px
+    );
+}
+
+/* Woven gi fabric — form backgrounds */
+.fabric-bg {
+  background-color: #111111;
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,0.015) 0px,
+      rgba(255,255,255,0.015) 1px,
+      transparent 1px,
+      transparent 6px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255,255,255,0.015) 0px,
+      rgba(255,255,255,0.015) 1px,
+      transparent 1px,
+      transparent 6px
+    );
+}
+
+/* =====================
+   RUBBER BAND BUTTON
+   ===================== */
+.rubber-btn {
+  position: relative;
+  display: inline-block;
+  overflow: visible;
+}
+
+.rubber-btn::before,
+.rubber-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+              opacity 0.18s ease;
+}
+
+/* Top and bottom borders */
+.rubber-btn::before {
+  border-top: 2px solid #10b981;
+  border-bottom: 2px solid #10b981;
+  transform: scaleX(0);
+  opacity: 0;
+}
+
+/* Left and right borders */
+.rubber-btn::after {
+  border-left: 2px solid #10b981;
+  border-right: 2px solid #10b981;
+  transform: scaleY(0);
+  opacity: 0;
+}
+
+.rubber-btn:hover::before {
+  transform: scaleX(1.06);
+  opacity: 1;
+}
+
+.rubber-btn:hover::after {
+  transform: scaleY(1.06);
+  opacity: 1;
+}
+
+/* =====================
+   NAVBAR LINK ANIMATIONS
+   ===================== */
+.nav-link {
+  position: relative;
+  display: inline-block;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  right: 50%;
+  height: 2px;
+  background: #10b981;
+  transition: left 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+              right 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.nav-link:hover::after {
+  left: 0;
+  right: 0;
+}
+
+/* =====================
+   STAGGER ANIMATION HELPERS
+   ===================== */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  animation: fadeUp 0.5s ease forwards;
+}
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
 }

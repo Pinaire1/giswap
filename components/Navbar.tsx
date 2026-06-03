@@ -8,6 +8,8 @@ import Image from "next/image";
 
 export default function Navbar() {
   const { data: session, status } = useSession();
+  console.log("Navbar Session:", session);
+console.log("Navbar Status:", status);
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -42,7 +44,7 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Auth */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="flex items-center gap-4">
             {status === "loading" ? (
               <div className="text-white text-sm">Loading...</div>
             ) : session ? (

@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { UploadButton } from "@/lib/uploadthing";
 
+
 export default function NewListingPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -21,10 +22,13 @@ export default function NewListingPage() {
   if (!session) return null;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  e.preventDefault();
 
-    const formData = new FormData(e.currentTarget);
+  const form = e.currentTarget;
+
+  setIsSubmitting(true);
+
+  const formData = new FormData(form);
     
     const data = {
       title: `${formData.get("brand")} ${formData.get("size")}`,
@@ -38,14 +42,17 @@ export default function NewListingPage() {
 
     try {
       const res = await fetch("/api/listings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    ...data,
+    images: uploadedImages,
+  }),
+});
 
       if (res.ok) {
         alert("✅ Gi posted successfully!");
-        e.currentTarget.reset();
+        form.reset();
         setUploadedImages([]);
       } else {
         alert("Failed to post gi");

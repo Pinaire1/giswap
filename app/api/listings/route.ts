@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
         condition: body.condition,
         price: parseFloat(body.price),
         description: body.description || "",
-        images: [],
+        images: body.images || [],
         userId: session.user.id,
       },
     });

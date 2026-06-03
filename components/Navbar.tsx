@@ -83,9 +83,9 @@ export default function Navbar() {
               <Link href="/listings/new" onClick={() => setIsOpen(false)} className="hover:text-emerald-400">
                 Sell Your Gi
               </Link>
-              <Link href="/dashboard" onClick={() => setIsOpen(false)} className="hover:text-emerald-400">
-                Dashboard
-              </Link>
+              <Link href="/profile" onClick={() => setIsOpen(false)} className="hover:text-emerald-400">
+  Profile
+</Link>
 
               <div className="pt-6 border-t border-zinc-800">
                 {session ? (

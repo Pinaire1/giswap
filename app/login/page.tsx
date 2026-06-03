@@ -1,6 +1,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import Image from "next/image";
 
 export default function LoginPage() {
   return (
@@ -15,16 +16,19 @@ export default function LoginPage() {
           onClick={() => signIn("google", { callbackUrl: "/" })}
           className="w-full flex items-center justify-center gap-3 py-4 border border-gray-300 rounded-xl hover:bg-gray-50 transition text-lg font-medium"
         >
-          <img 
-            src="https://www.google.com/favicon.ico" 
-            className="w-6 h-6" 
-            alt="Google" 
+          <Image
+            src="https://www.google.com/favicon.ico"
+            width={24}
+            height={24}
+            className="w-6 h-6"
+            alt="Google"
+            unoptimized
           />
           Continue with Google
         </button>
 
         <p className="text-center text-xs text-gray-500 mt-8">
-          We'll only use this for authentication
+          Well only use this for authentication
         </p>
       </div>
     </div>

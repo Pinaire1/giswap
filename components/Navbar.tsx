@@ -30,6 +30,29 @@ export default function Navbar() {
 
           {/* Desktop Auth */}
           <div className="hidden md:flex items-center gap-4">
+  {session ? (
+    <>
+      <a href="/profile" className="text-sm font-medium">
+        Profile
+      </a>
+
+      <button
+        onClick={() => signOut()}
+        className="text-sm font-medium text-red-500"
+      >
+        Sign out
+      </button>
+    </>
+  ) : (
+    <button
+      onClick={() => signIn()}
+      className="text-sm font-medium"
+    >
+      Sign in
+    </button>
+  )}
+</div>
+          <div className="hidden md:flex items-center gap-4">
             {status === "loading" ? (
               <div className="text-white">Loading...</div>
             ) : session ? (

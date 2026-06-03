@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { SessionProvider } from "next-auth/react";
 import "@uploadthing/react/styles.css";
+import Providers from "./providers";
 
 export const metadata: Metadata = {
   title: "GiSwap | BJJ Gi Marketplace",
@@ -17,6 +18,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen tatami-bg font-sans antialiased">
+        <Providers>
+          <Navbar />
+      {children}
+      </Providers>
         <SessionProvider>
           <Navbar />
           <main className="min-h-[calc(100vh-64px)]">

@@ -3,7 +3,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import Google from "next-auth/providers/google";
 import { prisma } from "@/lib/prisma";
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+const handler = NextAuth({
   adapter: PrismaAdapter(prisma),
 
   providers: [
@@ -15,7 +15,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
   session: { strategy: "jwt" },
 
-  secret: process.env.NEXTAUTH_SECRET, // ✅ REQUIRED FOR PROD
+  secret: process.env.NEXTAUTH_SECRET,
 
   callbacks: {
     async jwt({ token, user }) {
@@ -35,4 +35,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
 });
 
-export const { GET, POST } = handlers;
+export { handler as GET, handler as POST };

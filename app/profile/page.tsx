@@ -73,10 +73,20 @@ export default async function ProfilePage() {
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {user.listings.map((listing) => (
-              <div
-                key={listing.id}
-                className="bg-zinc-900 border border-zinc-800 rounded-xl p-4"
-              >
+  <div
+    key={listing.id}
+    className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden"
+  >
+    {listing.images?.length > 0 && (
+      <Image
+        src={listing.images[0]}
+        alt={listing.title}
+        width={400}
+        height={300}
+        className="w-full h-48 object-cover"
+      />
+    )}
+    <div className="p-4">
                 <h3 className="font-semibold text-lg text-white">
                   {listing.title}
                 </h3>
@@ -84,14 +94,22 @@ export default async function ProfilePage() {
                 <p className="text-zinc-400">
                   {listing.brand}
                 </p>
+                
+                <p className="text-sm text-zinc-500">
+                  Size: {listing.size}
+                </p>
 
                 <p className="text-emerald-400 font-bold mt-2">
-                  ${listing.price.toString()}
+                  {"$" + listing.price.toString()}
                 </p>
 
                 <p className="text-sm text-zinc-500 mt-2">
                   Condition: {listing.condition}
                 </p>
+                <div className="flex gap-4 mt-3 text-sm text-zinc-500">
+                  <span>👁️ 0 Views</span>
+                  <span>💬 0 Messages</span>
+                </div>
 
                 <div className="mt-4">
                   <span
@@ -105,6 +123,7 @@ export default async function ProfilePage() {
                   </span>
                 </div>
               </div>
+            </div>
             ))}
           </div>
         )}
@@ -124,7 +143,26 @@ export default async function ProfilePage() {
           <p className="text-sm text-zinc-500 mt-2">
             Buyers will be able to contact you about your listings here.
           </p>
-        </div>
+                <div className="mt-4 flex gap-2">
+        <button
+          className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-sm py-2 rounded"
+        >
+          Edit
+        </button>
+
+        <button
+          className="flex-1 bg-emerald-700 hover:bg-emerald-600 text-sm py-2 rounded"
+        >
+          Mark Sold
+        </button>
+
+        <button
+          className="flex-1 bg-red-700 hover:bg-red-600 text-sm py-2 rounded"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
       </section>
     </main>
   );

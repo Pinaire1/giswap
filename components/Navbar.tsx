@@ -21,14 +21,14 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8 text-white">
+          <div className=" md:flex items-center gap-8 text-white">
             <Link href="/listings" className="hover:text-emerald-400 transition-colors">Browse Gis</Link>
             <Link href="/listings/new" className="hover:text-emerald-400 transition-colors">Sell Your Gi</Link>
             <Link href="/dashboard" className="hover:text-emerald-400 transition-colors">Dashboard</Link>
           </div>
 
           {/* Desktop Auth + Profile */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className=" md:flex items-center gap-4">
             {status === "loading" ? (
               <div className="text-white">Loading...</div>
             ) : session ? (
@@ -71,7 +71,7 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <button 
             onClick={() => setIsOpen(!isOpen)} 
-            className="md:hidden text-white text-3xl focus:outline-none"
+            className="md text-white text-3xl focus:outline-none"
           >
             {isOpen ? "✕" : "☰"}
           </button>
@@ -79,7 +79,7 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden py-8 border-t border-zinc-800 bg-zinc-950">
+          <div className="md py-8 border-t border-zinc-800 bg-zinc-950">
             <div className="flex flex-col gap-6 text-lg text-white">
               <Link href="/listings" onClick={() => setIsOpen(false)}>Browse Gis</Link>
               <Link href="/listings/new" onClick={() => setIsOpen(false)}>Sell Your Gi</Link>

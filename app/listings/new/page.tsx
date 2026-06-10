@@ -1,18 +1,19 @@
 "use client";
 
-import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { UploadButton } from "@/lib/uploadthing";
-
+import ShareButtons from "@/components/sharebuttons";
+import Image from "next/image";
 
 export default function NewListingPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [newListing, setNewListing] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/login");
@@ -22,13 +23,10 @@ export default function NewListingPage() {
   if (!session) return null;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
+    e.preventDefault();
+    setIsSubmitting(true);
 
-  const form = e.currentTarget;
-
-  setIsSubmitting(true);
-
-  const formData = new FormData(form);
+    const formData = new FormData(e.currentTarget);
     
     const data = {
       title: `${formData.get("brand")} ${formData.get("size")}`,
@@ -42,17 +40,17 @@ export default function NewListingPage() {
 
     try {
       const res = await fetch("/api/listings", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    ...data,
-    images: uploadedImages,
-  }),
-});
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const result = await res.json();
 
       if (res.ok) {
+        setNewListing(result.listing);
         alert("✅ Gi posted successfully!");
-        form.reset();
+        e.currentTarget.reset();
         setUploadedImages([]);
       } else {
         alert("Failed to post gi");
@@ -82,6 +80,7 @@ export default function NewListingPage() {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
       >
+        {/* Your existing form fields... */}
         <div>
           <label className="block text-sm font-medium mb-2 text-gray-200">Brand</label>
           <input name="brand" type="text" className="w-full p-4 bg-zinc-800 border border-zinc-700 rounded-2xl text-white" placeholder="Shoyoroll, Tatami..." required />
@@ -140,19 +139,19 @@ export default function NewListingPage() {
         </div>
 
         {uploadedImages.length > 0 && (
-          <div className="flex flex-wrap gap-4">
-            {uploadedImages.map((url, i) => (
-              <Image
-                key={i}
-                src={url}
-                alt="uploaded"
-                width={112}
-                height={112}
-                className="w-28 h-28 object-cover rounded-2xl border border-emerald-900"
-              />
-            ))}
-          </div>
-        )}
+  <div className="flex flex-wrap gap-4">
+    {uploadedImages.map((url, i) => (
+      <Image
+        key={i}
+        src={url}
+        alt={`uploaded ${i}`}
+        width={112}
+        height={112}
+        className="w-28 h-28 object-cover rounded-2xl border border-emerald-900"
+      />
+    ))}
+  </div>
+)}
 
         <motion.button
           type="submit"
@@ -164,6 +163,26 @@ export default function NewListingPage() {
           {isSubmitting ? "THROWING ON THE MAT..." : "POST TO THE MAT"}
         </motion.button>
       </motion.form>
+
+      {/* Share Section - Shows after successful post */}
+      {newListing && (
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-12 bg-zinc-900 p-8 rounded-3xl border border-emerald-900"
+        >
+          <h3 className="text-2xl font-bold text-emerald-400 mb-6">🎉 Gi Posted Successfully!</h3>
+          <p className="text-gray-300 mb-6">Help spread the word and get it sold faster!</p>
+          
+          <ShareButtons 
+            title={newListing.title}
+            url={`https://giswap.vercel.app/listings/${newListing.id}`}
+            price={newListing.price}
+            brand={newListing.brand}
+            size={newListing.size}
+          />
+        </motion.div>
+      )}
     </div>
   );
 }

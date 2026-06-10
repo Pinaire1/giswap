@@ -33,16 +33,18 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  listings      Listing[]
-  sessions      Session[]
+  id               String    @id @default(cuid())
+  name             String?
+  email            String?   @unique
+  emailVerified    DateTime?
+  image            String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  accounts         Account[]
+  listings         Listing[]
+  sessions         Session[]
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
 }
 
 model VerificationToken {
@@ -54,7 +56,7 @@ model VerificationToken {
 }
 
 model Listing {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
   brand       String
   size        String
@@ -64,9 +66,31 @@ model Listing {
   description String?
   images      String[]
   weight      String?
-  isSold      Boolean  @default(false)
+  isSold      Boolean   @default(false)
   userId      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages    Message[]
+  sellerEmail String? // We'll store seller's email for easy contact
+}
+
+model Message {
+  id      String  @id @default(cuid())
+  content String
+  read    Boolean @default(false)
+
+  fromId String
+  from   User   @relation("SentMessages", fields: [fromId], references: [id])
+
+  toId String
+  to   User   @relation("ReceivedMessages", fields: [toId], references: [id])
+
+  listingId String?
+  listing   Listing? @relation(fields: [listingId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([fromId, toId])
+  @@index([toId, read])
 }

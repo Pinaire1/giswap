@@ -25,6 +25,9 @@ export default function Navbar() {
             <Link href="/listings" className="hover:text-emerald-400 transition-colors">Browse Gis</Link>
             <Link href="/listings/new" className="hover:text-emerald-400 transition-colors">Sell Your Gi</Link>
             <Link href="/dashboard" className="hover:text-emerald-400 transition-colors">Dashboard</Link>
+            <Link href="/profile/messages">
+  Messages
+</Link>
           </div>
 
           {/* Desktop Auth + Profile */}

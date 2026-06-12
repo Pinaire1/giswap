@@ -1,35 +1,47 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { prisma } from "@/lib/prisma";
+import { auth } from "@/auth";
 
 export async function POST(request: NextRequest) {
   try {
-    const { sellerEmail, buyerName, buyerEmail, message, listingTitle } = await request.json();
+    const session = await auth();
 
-    if (!sellerEmail || !buyerEmail || !message) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
-    await resend.emails.send({
-      from: "GiSwap <noreply@giswap.app>",
-      to: sellerEmail,
-      subject: `New Inquiry: ${listingTitle}`,
-      html: `
-        <h2>New message about your Gi</h2>
-        <p><strong>From:</strong> ${buyerName} (${buyerEmail})</p>
-        <p><strong>Regarding:</strong> ${listingTitle}</p>
-        <hr />
-        <p>${message}</p>
-        <hr />
-        <p>Reply directly to this email to respond to the buyer.</p>
-        <p><small>Sent via GiSwap</small></p>
-      `,
+    const { sellerId, listingId, content } =
+      await request.json();
+
+    if (!sellerId || !content) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    const message = await prisma.message.create({
+      data: {
+        content,
+        fromId: session.user.id,
+        toId: sellerId,
+        listingId,
+      },
     });
 
-    return NextResponse.json({ success: true, message: "Email sent successfully" });
+    return NextResponse.json({
+      success: true,
+      message,
+    });
   } catch (error) {
-    console.error("Email error:", error);
-    return NextResponse.json({ error: "Failed to send message" }, { status: 500 });
+    console.error("Message error:", error);
+
+    return NextResponse.json(
+      { error: "Failed to send message" },
+      { status: 500 }
+    );
   }
 }

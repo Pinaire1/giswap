@@ -13,7 +13,7 @@ type Listing = {
   condition: string;
   price: number;
   images: string[];
-  user: { name: string };
+  user: { name: string; email: string };
 };
 
 export default function ListingsPage() {

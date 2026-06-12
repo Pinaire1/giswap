@@ -8,9 +8,14 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
       include: {
         user: {
-          select: { name: true, image: true }
+          select: { 
+            id: true,
+            name:true,
+            email:true,
+            image: true,
+            },
+          }
         }
-      }
     });
 
     return NextResponse.json(listings);

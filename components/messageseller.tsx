@@ -3,12 +3,16 @@
 import { useState } from "react";
 
 interface MessageSellerProps {
-  sellerEmail: string;
-  listingTitle: string;
   sellerName: string;
+  sellerId: string;
+  listingId: string;
 }
 
-export default function MessageSeller({ sellerEmail, listingTitle, sellerName }: MessageSellerProps) {
+export default function MessageSeller({
+  sellerId,
+  listingId,
+  sellerName,
+}: MessageSellerProps) {
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -21,13 +25,13 @@ export default function MessageSeller({ sellerEmail, listingTitle, sellerName }:
     try {
       const res = await fetch("/api/messages", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          sellerEmail,
-          buyerName: "A Buyer",           // TODO: Replace with real user name
-          buyerEmail: "buyer@example.com", // TODO: Replace with real user email
-          message,
-          listingTitle,
+          sellerId,
+          listingId,
+          content: message,
         }),
       });
 
@@ -38,7 +42,8 @@ export default function MessageSeller({ sellerEmail, listingTitle, sellerName }:
       } else {
         alert("Failed to send message");
       }
-    } catch {
+    } catch (error) {
+      console.error(error);
       alert("Error sending message. Please try again.");
     } finally {
       setIsSending(false);
@@ -52,9 +57,10 @@ export default function MessageSeller({ sellerEmail, listingTitle, sellerName }:
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder={`Hi ${sellerName}, I'm interested in your ${listingTitle}...`}
+            placeholder={`Hi ${sellerName}, I'm interested in this listing...`}
             className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-2xl text-sm h-24 resize-y focus:outline-none focus:border-emerald-500"
           />
+
           <button
             onClick={sendMessage}
             disabled={isSending || !message.trim()}
@@ -65,7 +71,7 @@ export default function MessageSeller({ sellerEmail, listingTitle, sellerName }:
         </div>
       ) : (
         <div className="text-emerald-400 text-center py-4 font-medium bg-emerald-950/30 rounded-2xl">
-          Message sent successfully! 🎉 The seller will reply via email.
+          Message sent successfully! 🎉
         </div>
       )}
     </div>

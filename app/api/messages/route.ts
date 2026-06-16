@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
+import { pusherServer } from "@/lib/pusher";
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,6 +32,13 @@ export async function POST(request: NextRequest) {
         listingId,
       },
     });
+
+    // 🔥 REALTIME PUSH
+    await pusherServer.trigger(
+      `listing-${listingId}`,
+      "new-message",
+      message
+    );
 
     return NextResponse.json({
       success: true,

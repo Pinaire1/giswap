@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { auth } from "@/auth";
 
 async function ownsListing(userId: string, listingId: string) {
@@ -28,15 +29,16 @@ export async function PATCH(
 
   const body = await req.json();
 
-  const allowed = ["title", "brand", "size", "condition", "price", "description", "images", "isSold"] as const;
-  type AllowedField = (typeof allowed)[number];
-  const data: Partial<Record<AllowedField, unknown>> = {};
-
-  for (const key of allowed) {
-    if (key in body) {
-      data[key] = key === "price" ? parseFloat(String(body[key])) : body[key];
-    }
-  }
+  const data: Prisma.ListingUpdateInput = {
+    ...("title" in body && { title: String(body.title) }),
+    ...("brand" in body && { brand: String(body.brand) }),
+    ...("size" in body && { size: String(body.size) }),
+    ...("condition" in body && { condition: String(body.condition) }),
+    ...("price" in body && { price: parseFloat(String(body.price)) }),
+    ...("description" in body && { description: String(body.description) }),
+    ...("images" in body && { images: body.images as string[] }),
+    ...("isSold" in body && { isSold: Boolean(body.isSold) }),
+  };
 
   const listing = await prisma.listing.update({ where: { id }, data });
   return NextResponse.json({ success: true, listing });

@@ -1,9 +1,12 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import ProfileListings from "@/components/ProfileListings";
+import PaymentSettings from "@/components/PaymentSettings";
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -69,6 +72,12 @@ export default async function ProfilePage() {
           }))}
         />
       </section>
+
+      {/* Payment Methods */}
+      <PaymentSettings
+        initialPaypal={user.paypalHandle ?? null}
+        initialVenmo={user.venmoHandle ?? null}
+      />
 
       {/* Inbox */}
       <section>

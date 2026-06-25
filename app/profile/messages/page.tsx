@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 import { formatDistanceToNow } from "date-fns";
 
 export default async function MessagesPage() {

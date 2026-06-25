@@ -19,6 +19,13 @@ type Listing = {
   user: { id: string; name: string | null; email: string | null };
 };
 
+const conditionColor: Record<string, string> = {
+  New:        "bg-blue-950 text-blue-300 border-blue-800",
+  "Like New":  "bg-purple-950 text-purple-300 border-purple-800",
+  Good:       "bg-amber-950 text-amber-400 border-amber-800",
+  Worn:       "bg-zinc-800 text-zinc-400 border-zinc-700",
+};
+
 export default function ListingsGrid({ listings }: { listings: Listing[] }) {
   const { data: session } = useSession();
   const [searchTerm, setSearchTerm] = useState("");
@@ -37,20 +44,21 @@ export default function ListingsGrid({ listings }: { listings: Listing[] }) {
           placeholder="Search brands or models..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full md:w-96 p-4 bg-zinc-900 border border-zinc-700 rounded-2xl text-white placeholder:text-gray-500 focus:border-emerald-500 focus:outline-none"
+          className="w-full md:w-96 p-4 bg-[#111] border border-[#1e2a4a] rounded-2xl text-white placeholder:text-gray-600 focus:border-blue-600 focus:outline-none transition"
         />
       </div>
 
       {filtered.length === 0 ? (
         <div className="text-center py-20">
-          <p className="text-3xl text-gray-400">
-            {listings.length === 0 ? "No gis listed yet — be the first!" : "No gis match your search."}
+          <p className="text-3xl text-gray-600">
+            {listings.length === 0 ? "No gis on the mat yet — be the first to post!" : "No gis match your search."}
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {filtered.map((listing, index) => {
             const isOwnListing = session?.user?.id === listing.userId;
+            const condClass = conditionColor[listing.condition] ?? conditionColor.Worn;
 
             return (
               <motion.div
@@ -58,10 +66,10 @@ export default function ListingsGrid({ listings }: { listings: Listing[] }) {
                 initial={{ opacity: 0, y: 60 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.03 }}
-                whileHover={{ y: -12, scale: 1.02 }}
-                className="group bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden hover:border-emerald-500 transition-all duration-300"
+                whileHover={{ y: -10, scale: 1.02 }}
+                className="group bg-[#111] border border-[#1e2a4a] rounded-3xl overflow-hidden hover:border-blue-600 hover:shadow-lg hover:shadow-blue-900/30 transition-all duration-300"
               >
-                <div className="h-64 bg-zinc-800 relative overflow-hidden">
+                <div className="h-60 bg-[#161616] relative overflow-hidden">
                   {listing.images?.length > 0 ? (
                     <Image
                       src={listing.images[0]}
@@ -70,35 +78,35 @@ export default function ListingsGrid({ listings }: { listings: Listing[] }) {
                       className="object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                   ) : (
-                    <div className="h-full flex items-center justify-center text-8xl opacity-30">🥋</div>
+                    <div className="h-full flex items-center justify-center text-7xl opacity-20">🥋</div>
                   )}
+                  {/* Belt-color top edge on hover */}
+                  <div className="absolute top-0 left-0 right-0 h-0.5 belt-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
 
-                <div className="p-7">
-                  <div className="flex justify-between items-start gap-2">
-                    <h3 className="text-xl font-bold text-white">{listing.brand} {listing.size}</h3>
-                    <p className="text-2xl font-black text-emerald-400 shrink-0">${listing.price}</p>
+                <div className="p-6">
+                  <div className="flex justify-between items-start gap-2 mb-1">
+                    <h3 className="text-lg font-bold text-white leading-tight">{listing.brand} {listing.size}</h3>
+                    <p className="text-2xl font-black text-amber-400 shrink-0">${listing.price}</p>
                   </div>
 
-                  <p className="text-gray-400 mt-2">by {listing.user.name ?? "Seller"}</p>
+                  <p className="text-gray-500 text-sm mb-4">by {listing.user.name ?? "Seller"}</p>
 
-                  <div className="mt-5">
-                    <span className="px-5 py-2 bg-emerald-950 text-emerald-400 text-sm font-medium rounded-full border border-emerald-900">
-                      {listing.condition}
-                    </span>
-                  </div>
+                  <span className={`px-3 py-1 text-xs font-medium rounded-full border ${condClass}`}>
+                    {listing.condition}
+                  </span>
 
                   <Link
                     href={`/listings/${listing.id}`}
-                    className="mt-8 block w-full text-center py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold text-lg transition active:scale-95"
+                    className="mt-6 block w-full text-center py-3 bg-blue-700 hover:bg-blue-600 text-white rounded-2xl font-bold transition active:scale-95"
                   >
-                    VIEW GI
+                    View Gi
                   </Link>
 
                   {session && !isOwnListing && (
                     <button
                       onClick={() => setMessagingListing(listing)}
-                      className="mt-3 w-full py-3 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-emerald-500 text-white rounded-2xl font-bold text-base transition active:scale-95"
+                      className="mt-2 w-full py-3 bg-transparent hover:bg-purple-950/40 border border-[#2a2a4a] hover:border-purple-600 text-gray-300 hover:text-purple-300 rounded-2xl font-medium text-sm transition active:scale-95"
                     >
                       Message Seller
                     </button>
@@ -116,27 +124,30 @@ export default function ListingsGrid({ listings }: { listings: Listing[] }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
             onClick={(e: React.MouseEvent<HTMLDivElement>) => {
               if (e.target === e.currentTarget) setMessagingListing(null);
             }}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-zinc-900 border border-zinc-700 rounded-3xl p-8 w-full max-w-md"
+              initial={{ scale: 0.92, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.92, opacity: 0, y: 20 }}
+              className="bg-[#111] border border-[#1e2a4a] rounded-3xl p-8 w-full max-w-md shadow-2xl shadow-blue-950/50"
             >
+              {/* Belt stripe top */}
+              <div className="belt-gradient h-0.5 w-full rounded-full mb-6 opacity-60" />
+
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-white">Message Seller</h2>
-                  <p className="text-gray-400 text-sm mt-1">
-                    {messagingListing.brand} {messagingListing.size} — by {messagingListing.user.name ?? "Seller"}
+                  <h2 className="text-xl font-bold text-white">Message Seller</h2>
+                  <p className="text-gray-500 text-sm mt-1">
+                    {messagingListing.brand} {messagingListing.size} · {messagingListing.user.name ?? "Seller"}
                   </p>
                 </div>
                 <button
                   onClick={() => setMessagingListing(null)}
-                  className="text-gray-500 hover:text-white text-3xl leading-none transition"
+                  className="text-gray-600 hover:text-white text-2xl leading-none transition"
                 >
                   ×
                 </button>

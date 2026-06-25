@@ -11,45 +11,54 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="bg-zinc-950 border-b border-zinc-800 sticky top-0 z-50">
+    <nav className="bg-[#0d0d0d] border-b border-[#1e2a4a] sticky top-0 z-50">
+      {/* Belt stripe accent at top */}
+      <div className="belt-gradient h-0.5 w-full opacity-70" />
+
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 font-bold text-2xl text-white">
-            <Shirt className="w-8 h-8 text-emerald-500" />
-            <span>GiSwap</span>
+            <Shirt className="w-8 h-8 text-blue-500" />
+            <span className="belt-text font-black tracking-tight">GiSwap</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className=" md:flex items-center gap-8 text-white">
-            <Link href="/listings" className="hover:text-emerald-400 transition-colors">Browse Gis</Link>
-            <Link href="/listings/new" className="hover:text-emerald-400 transition-colors">Sell Your Gi</Link>
-            <Link href="/dashboard" className="hover:text-emerald-400 transition-colors">Dashboard</Link>
-            <Link href="/profile/messages">
-  Messages
-</Link>
+          <div className="hidden md:flex items-center gap-8 text-gray-300">
+            <Link href="/listings" className="nav-link hover:text-white transition-colors">Browse Gis</Link>
+            <Link href="/listings/new" className="nav-link hover:text-white transition-colors">Sell Your Gi</Link>
+            <Link href="/dashboard" className="nav-link hover:text-white transition-colors">Dashboard</Link>
+            <Link href="/profile/messages" className="nav-link hover:text-white transition-colors">Messages</Link>
           </div>
 
           {/* Desktop Auth + Profile */}
-          <div className=" md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-4">
             {status === "loading" ? (
-              <div className="text-white">Loading...</div>
+              <div className="text-gray-500 text-sm">Loading...</div>
             ) : session ? (
               <div className="flex items-center gap-4">
-                <Link href="/profile" className="flex items-center gap-3 hover:text-emerald-400 transition">
+                <Link href="/profile" className="flex items-center gap-3 hover:text-blue-400 transition text-white">
                   {session.user?.image ? (
-                    <Image src={session.user.image} alt="Profile" width={32} height={32} className="rounded-full" />
+                    <Image
+                      src={session.user.image}
+                      alt="Profile"
+                      width={32}
+                      height={32}
+                      className="rounded-full ring-2 ring-blue-700"
+                    />
                   ) : (
-                    <User className="w-8 h-8" />
+                    <div className="w-8 h-8 rounded-full bg-blue-900 border border-blue-700 flex items-center justify-center">
+                      <User className="w-4 h-4 text-blue-400" />
+                    </div>
                   )}
                   <span className="text-sm font-medium">{session.user?.name?.split(" ")[0]}</span>
                 </Link>
 
                 <button
                   onClick={() => signOut({ callbackUrl: "/" })}
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-950 rounded-md transition"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-950/50 rounded-lg transition"
                 >
-                  <LogOut size={18} />
+                  <LogOut size={16} />
                   Logout
                 </button>
               </div>
@@ -57,13 +66,13 @@ export default function Navbar() {
               <>
                 <button
                   onClick={() => signIn("google")}
-                  className="px-5 py-2 text-white hover:bg-zinc-800 rounded-md transition"
+                  className="px-5 py-2 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition text-sm"
                 >
                   Log in
                 </button>
                 <button
                   onClick={() => signIn("google")}
-                  className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium transition"
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition text-sm"
                 >
                   Sign up
                 </button>
@@ -72,9 +81,9 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button 
-            onClick={() => setIsOpen(!isOpen)} 
-            className="md text-white text-3xl focus:outline-none"
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="md:hidden text-white text-2xl focus:outline-none"
           >
             {isOpen ? "✕" : "☰"}
           </button>
@@ -82,31 +91,29 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md py-8 border-t border-zinc-800 bg-zinc-950">
-            <div className="flex flex-col gap-6 text-lg text-white">
-              <Link href="/listings" onClick={() => setIsOpen(false)}>Browse Gis</Link>
-              <Link href="/listings/new" onClick={() => setIsOpen(false)}>Sell Your Gi</Link>
-              <Link href="/dashboard" onClick={() => setIsOpen(false)}>Dashboard</Link>
+          <div className="md:hidden py-6 border-t border-[#1e2a4a]">
+            <div className="flex flex-col gap-5 text-base text-gray-300">
+              <Link href="/listings" onClick={() => setIsOpen(false)} className="hover:text-blue-400 transition">Browse Gis</Link>
+              <Link href="/listings/new" onClick={() => setIsOpen(false)} className="hover:text-blue-400 transition">Sell Your Gi</Link>
+              <Link href="/dashboard" onClick={() => setIsOpen(false)} className="hover:text-blue-400 transition">Dashboard</Link>
+              <Link href="/profile/messages" onClick={() => setIsOpen(false)} className="hover:text-blue-400 transition">Messages</Link>
 
               {session ? (
                 <>
-                  <Link href="/profile" onClick={() => setIsOpen(false)} className="flex items-center gap-3">
-                    <User size={24} /> Profile
+                  <Link href="/profile" onClick={() => setIsOpen(false)} className="flex items-center gap-3 hover:text-blue-400 transition">
+                    <User size={20} /> Profile
                   </Link>
                   <button
-                    onClick={() => {
-                      signOut({ callbackUrl: "/" });
-                      setIsOpen(false);
-                    }}
-                    className="flex items-center gap-3 text-red-400"
+                    onClick={() => { signOut({ callbackUrl: "/" }); setIsOpen(false); }}
+                    className="flex items-center gap-3 text-red-400 text-left"
                   >
-                    <LogOut size={24} /> Logout
+                    <LogOut size={20} /> Logout
                   </button>
                 </>
               ) : (
                 <button
                   onClick={() => signIn("google")}
-                  className="text-left py-3 hover:text-emerald-400"
+                  className="text-left py-3 text-blue-400 hover:text-blue-300 transition font-medium"
                 >
                   Sign in with Google
                 </button>

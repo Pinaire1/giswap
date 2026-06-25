@@ -22,21 +22,9 @@ type Thread = {
   listingId: string;
   buyerId: string;
   sellerId: string;
-  listing: {
-    id: string;
-    title: string;
-    images: string[];
-  };
-  buyer: {
-    id: string;
-    name?: string | null;
-    image?: string | null;
-  };
-  seller: {
-    id: string;
-    name?: string | null;
-    image?: string | null;
-  };
+  listing: { id: string; title: string; images: string[] };
+  buyer:   { id: string; name?: string | null; image?: string | null };
+  seller:  { id: string; name?: string | null; image?: string | null };
   messages: Message[];
 };
 
@@ -63,9 +51,7 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
         return [...prev, newMessage];
       });
     });
-    return () => {
-      pusherClient.unsubscribe(`thread-${thread.id}`);
-    };
+    return () => { pusherClient.unsubscribe(`thread-${thread.id}`); };
   }, [thread.id]);
 
   useEffect(() => {
@@ -75,7 +61,6 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
   const sendMessage = async () => {
     const trimmed = text.trim();
     if (!trimmed || loading) return;
-
     setLoading(true);
 
     const tempId = `temp-${Date.now()}`;
@@ -94,11 +79,7 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
       const res = await fetch("/api/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          listingId: thread.listingId,
-          sellerId,
-          content: trimmed,
-        }),
+        body: JSON.stringify({ listingId: thread.listingId, sellerId, content: trimmed }),
       });
 
       const data = await res.json();
@@ -126,8 +107,8 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
   return (
     <div className="max-w-2xl mx-auto h-[calc(100vh-64px)] flex flex-col">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-800 bg-zinc-950">
-        <Link href="/profile/messages" className="text-zinc-400 hover:text-white mr-1">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-[#1e2a4a] bg-[#0d0d0d]">
+        <Link href="/profile/messages" className="text-gray-500 hover:text-blue-400 mr-1 transition text-lg">
           ←
         </Link>
 
@@ -137,10 +118,10 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
             alt={other.name ?? "User"}
             width={36}
             height={36}
-            className="rounded-full"
+            className="rounded-full ring-1 ring-blue-800"
           />
         ) : (
-          <div className="w-9 h-9 rounded-full bg-zinc-700 flex items-center justify-center text-sm text-zinc-300">
+          <div className="w-9 h-9 rounded-full bg-blue-950 border border-blue-800 flex items-center justify-center text-sm text-blue-400">
             {other.name?.[0] ?? "?"}
           </div>
         )}
@@ -149,7 +130,7 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
           <p className="font-semibold text-white text-sm">{other.name ?? "Unknown"}</p>
           <Link
             href={`/listings/${thread.listing.id}`}
-            className="text-xs text-zinc-400 hover:text-emerald-400 transition"
+            className="text-xs text-blue-400/70 hover:text-blue-400 transition"
           >
             {thread.listing.title}
           </Link>
@@ -157,11 +138,9 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-black">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-[#0a0a0a]">
         {messages.length === 0 && (
-          <p className="text-center text-zinc-600 text-sm mt-8">
-            No messages yet. Say hello!
-          </p>
+          <p className="text-center text-gray-700 text-sm mt-8">No messages yet. Say hello!</p>
         )}
 
         {messages.map((msg) => {
@@ -169,15 +148,12 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
           const isTemp = msg.id.startsWith("temp-");
 
           return (
-            <div
-              key={msg.id}
-              className={`flex ${isMine ? "justify-end" : "justify-start"}`}
-            >
+            <div key={msg.id} className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
               <div
                 className={`max-w-[72%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                   isMine
-                    ? `bg-emerald-600 text-white ${isTemp ? "opacity-60" : ""}`
-                    : "bg-zinc-800 text-zinc-100"
+                    ? `bg-blue-700 text-white ${isTemp ? "opacity-60" : ""}`
+                    : "bg-[#1a1a2e] border border-[#1e2a4a] text-gray-200"
                 }`}
               >
                 {msg.content}
@@ -190,19 +166,19 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
       </div>
 
       {/* Input */}
-      <div className="px-4 py-3 border-t border-zinc-800 bg-zinc-950 flex gap-2 items-center">
+      <div className="px-4 py-3 border-t border-[#1e2a4a] bg-[#0d0d0d] flex gap-2 items-center">
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Type a message…"
-          className="flex-1 bg-zinc-900 border border-zinc-700 rounded-full px-4 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-emerald-500"
+          className="flex-1 bg-[#111] border border-[#1e2a4a] rounded-full px-4 py-2.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-blue-600 transition"
         />
 
         <button
           onClick={sendMessage}
           disabled={loading || !text.trim()}
-          className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-700 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-full text-sm font-medium transition"
+          className="bg-blue-700 hover:bg-blue-600 disabled:bg-[#1a1a1a] disabled:text-gray-600 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-full text-sm font-semibold transition"
         >
           {loading ? "…" : "Send"}
         </button>

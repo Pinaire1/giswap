@@ -19,10 +19,13 @@ export default async function ListingsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
-      <h1 className="text-6xl font-black text-white mb-4 tracking-tighter">
-        ON THE MAT
-      </h1>
-      <p className="text-emerald-400 text-2xl mb-12">Find your next roll</p>
+      <div className="mb-12">
+        <div className="belt-gradient h-0.5 w-24 rounded-full mb-6 opacity-70" />
+        <h1 className="text-6xl font-black text-white tracking-tighter leading-none mb-3">
+          ON THE MAT
+        </h1>
+        <p className="text-blue-400 text-xl font-medium">Find your next roll</p>
+      </div>
 
       <ListingsGrid listings={serialized} />
     </div>

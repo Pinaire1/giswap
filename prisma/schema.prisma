@@ -3,7 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Account {
@@ -45,6 +47,7 @@ model User {
   sessions      Session[]
   sentMessages  Message[] @relation("SentMessages")
   reports       Report[]
+  feedbacks     Feedback[]
 
   messageThreads MessageThread[] @relation("UserThreads")
   buyerThreads   MessageThread[] @relation("BuyerThreads")
@@ -135,4 +138,21 @@ model Report {
 
   @@index([listingId])
   @@index([status])
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  category  String
+  rating    Int?
+  message   String
+  context   String?
+  status    String   @default("new")
+  createdAt DateTime @default(now())
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([userId])
+  @@index([createdAt])
 }

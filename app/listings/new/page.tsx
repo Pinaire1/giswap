@@ -50,15 +50,14 @@ export default function NewListingPage() {
 
       if (res.ok) {
         setNewListing(result.listing);
-        alert("Gi posted successfully!");
         e.currentTarget.reset();
         setUploadedImages([]);
       } else {
-        alert("Failed to post gi");
+        alert("Failed to post gi. Please try again.");
       }
     } catch (error) {
       console.error(error);
-      alert("Error posting gi");
+      alert("Error posting gi. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -74,7 +73,7 @@ export default function NewListingPage() {
       <motion.h1
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-6xl font-black mb-2 text-white tracking-tighter"
+        className="text-4xl sm:text-6xl font-black mb-2 text-white tracking-tighter"
       >
         Post Your Gi
       </motion.h1>
@@ -82,7 +81,7 @@ export default function NewListingPage() {
 
       <motion.form
         onSubmit={handleSubmit}
-        className="space-y-8 bg-[#111] p-10 rounded-3xl border border-[#1e2a4a]"
+        className="space-y-8 bg-[#111] p-6 sm:p-10 rounded-3xl border border-[#1e2a4a]"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
       >
@@ -197,7 +196,7 @@ export default function NewListingPage() {
           <p className="text-gray-400 text-sm mb-6">Help spread the word and get it sold faster.</p>
           <ShareButtons
             title={newListing.title}
-            url={`https://giswap.vercel.app/listings/${newListing.id}`}
+            url={`${process.env.NEXT_PUBLIC_APP_URL ?? "https://giswap.vercel.app"}/listings/${newListing.id}`}
             price={newListing.price}
             brand={newListing.brand}
             size={newListing.size}

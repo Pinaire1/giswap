@@ -4,6 +4,7 @@ import "@uploadthing/react/styles.css";
 import Navbar from "@/components/Navbar";
 import { SessionProvider } from "next-auth/react";
 import Providers from "./providers";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "GiSwap | BJJ Gi Marketplace",
@@ -25,6 +26,7 @@ export default function RootLayout({
               {children}
             </main>
 
+            <Analytics />
             <footer className="bg-[#0d0d0d] border-t border-[#1e2a4a] text-gray-500 py-10 mt-12">
               <div className="max-w-7xl mx-auto px-6 text-center space-y-3">
                 {/* Belt stripe bar */}

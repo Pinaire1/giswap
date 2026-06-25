@@ -1,19 +1,19 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
+import { auth } from "@/auth";
 
 const f = createUploadthing();
 
 export const ourFileRouter = {
   giImageUploader: f({
-    image: {
-      maxFileSize: "8MB",
-      maxFileCount: 5,
-    },
+    image: { maxFileSize: "8MB", maxFileCount: 5 },
   })
     .middleware(async () => {
-      return { userId: "temp" };
+      const session = await auth();
+      if (!session?.user?.id) throw new Error("Unauthorized");
+      return { userId: session.user.id };
     })
-    .onUploadComplete(async ({ file }) => {
-      console.log("✅ File uploaded:", file.url);
+    .onUploadComplete(async ({ metadata, file }) => {
+      console.log("✅ File uploaded by", metadata.userId, file.url);
       return { url: file.url };
     }),
 } satisfies FileRouter;

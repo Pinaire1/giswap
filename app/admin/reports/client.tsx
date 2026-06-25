@@ -65,7 +65,15 @@ export default function AdminReportsClient({ reports: initial }: { reports: Repo
           </span>
         )}
       </div>
-      <p className="text-gray-500 text-sm mb-10">Review reported listings.</p>
+      <div className="flex items-center justify-between mb-10">
+        <p className="text-gray-500 text-sm">Review reported listings.</p>
+        <Link
+          href="/admin/feedback"
+          className="text-xs text-gray-500 hover:text-blue-400 transition"
+        >
+          View Feedback →
+        </Link>
+      </div>
 
       {/* Filter tabs */}
       <div className="flex gap-2 mb-8">

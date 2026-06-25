@@ -5,6 +5,9 @@ import Navbar from "@/components/Navbar";
 import { SessionProvider } from "next-auth/react";
 import Providers from "./providers";
 import { Analytics } from "@vercel/analytics/next";
+import dynamic from "next/dynamic";
+
+const FeedbackWidget = dynamic(() => import("@/components/FeedbackWidget"), { ssr: false });
 
 export const metadata: Metadata = {
   title: "GiSwap | BJJ Gi Marketplace",
@@ -26,6 +29,7 @@ export default function RootLayout({
               {children}
             </main>
 
+            <FeedbackWidget />
             <Analytics />
             <footer className="bg-[#0d0d0d] border-t border-[#1e2a4a] text-gray-500 py-10 mt-12">
               <div className="max-w-7xl mx-auto px-6 text-center space-y-3">

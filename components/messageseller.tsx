@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import FeedbackModal from "./FeedbackModal";
 
 interface MessageSellerProps {
   sellerName: string;
@@ -18,6 +19,8 @@ export default function MessageSeller({
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState("");
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [threadId, setThreadId] = useState("");
 
   const sendMessage = async () => {
     if (!message.trim()) return;
@@ -34,7 +37,8 @@ export default function MessageSeller({
       const data = await res.json();
 
       if (res.ok && data?.thread?.id) {
-        router.push(`/profile/messages/${data.thread.id}`);
+        setThreadId(data.thread.id);
+        setShowFeedback(true);
       } else {
         setError(data?.error ?? "Failed to send message");
       }
@@ -63,6 +67,12 @@ export default function MessageSeller({
       >
         {isSending ? "Sending…" : `Message ${sellerName}`}
       </button>
+
+      <FeedbackModal
+        open={showFeedback}
+        context="buy-flow"
+        onClose={() => router.push(`/profile/messages/${threadId}`)}
+      />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { UploadButton } from "@/lib/uploadthing";
 import ShareButtons from "@/components/sharebuttons";
+import FeedbackModal from "@/components/FeedbackModal";
 import Image from "next/image";
 
 export default function NewListingPage() {
@@ -14,6 +15,7 @@ export default function NewListingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [newListing, setNewListing] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
+  const [showFeedback, setShowFeedback] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/login");
@@ -50,6 +52,7 @@ export default function NewListingPage() {
 
       if (res.ok) {
         setNewListing(result.listing);
+        setShowFeedback(true);
         e.currentTarget.reset();
         setUploadedImages([]);
       } else {
@@ -203,6 +206,12 @@ export default function NewListingPage() {
           />
         </motion.div>
       )}
+
+      <FeedbackModal
+        open={showFeedback}
+        context="sell-flow"
+        onClose={() => setShowFeedback(false)}
+      />
     </div>
   );
 }

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { pusherClient } from "@/lib/pusher-client";
+import Image from "next/image";
+import Link from "next/link";
 
 type Message = {
   id: string;
@@ -11,6 +13,7 @@ type Message = {
   from?: {
     id: string;
     name?: string | null;
+    image?: string | null;
   };
 };
 
@@ -20,13 +23,19 @@ type Thread = {
   buyerId: string;
   sellerId: string;
   listing: {
+    id: string;
     title: string;
+    images: string[];
   };
   buyer: {
+    id: string;
     name?: string | null;
+    image?: string | null;
   };
   seller: {
+    id: string;
     name?: string | null;
+    image?: string | null;
   };
   messages: Message[];
 };
@@ -36,67 +45,45 @@ interface ChatClientProps {
   currentUserId: string;
 }
 
-export default function ChatClient({
-  thread,
-  currentUserId,
-}: ChatClientProps) {
-  const [messages, setMessages] = useState<Message[]>(
-    thread.messages
-  );
-
+export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
+  const [messages, setMessages] = useState<Message[]>(thread.messages);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
-
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
-  const scrollToBottom = () => {
-    bottomRef.current?.scrollIntoView({
-      behavior: "smooth",
-    });
-  };
+  const isBuyer = currentUserId === thread.buyerId;
+  const other = isBuyer ? thread.seller : thread.buyer;
+  const sellerId = thread.sellerId;
+
   useEffect(() => {
-  const channel = pusherClient.subscribe(
-    `thread-${thread.id}`
-  );
-
-  channel.bind(
-    "new-message",
-    (newMessage: Message) => {
+    const channel = pusherClient.subscribe(`thread-${thread.id}`);
+    channel.bind("new-message", (newMessage: Message) => {
       setMessages((prev) => {
-        const exists = prev.some(
-          (m) => m.id === newMessage.id
-        );
-
-        if (exists) return prev;
-
+        if (prev.some((m) => m.id === newMessage.id)) return prev;
         return [...prev, newMessage];
       });
-    }
-  );
-
-  return () => {
-    pusherClient.unsubscribe(
-      `thread-${thread.id}`
-    );
-  };
-}, [thread.id]);
+    });
+    return () => {
+      pusherClient.unsubscribe(`thread-${thread.id}`);
+    };
+  }, [thread.id]);
 
   useEffect(() => {
-    scrollToBottom();
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const sendMessage = async () => {
-    if (!text.trim()) return;
+    const trimmed = text.trim();
+    if (!trimmed || loading) return;
 
     setLoading(true);
 
+    const tempId = `temp-${Date.now()}`;
     const tempMessage: Message = {
-      id: Date.now().toString(),
-      content: text,
+      id: tempId,
+      content: trimmed,
       fromId: currentUserId,
-      from: {
-        id: currentUserId,
-      },
+      from: { id: currentUserId },
       createdAt: new Date().toISOString(),
     };
 
@@ -106,16 +93,11 @@ export default function ChatClient({
     try {
       const res = await fetch("/api/messages", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           listingId: thread.listingId,
-          toId:
-            currentUserId === thread.buyerId
-              ? thread.sellerId
-              : thread.buyerId,
-          content: tempMessage.content,
+          sellerId,
+          content: trimmed,
         }),
       });
 
@@ -123,56 +105,79 @@ export default function ChatClient({
 
       if (data?.message) {
         setMessages((prev) =>
-          prev.map((m) =>
-            m.id === tempMessage.id
-              ? (data.message as Message)
-              : m
-          )
+          prev.map((m) => (m.id === tempId ? (data.message as Message) : m))
         );
       }
     } catch (error) {
       console.error(error);
+      setMessages((prev) => prev.filter((m) => m.id !== tempId));
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="max-w-3xl mx-auto h-screen flex flex-col bg-zinc-950 text-white">
-      {/* Header */}
-      <div className="p-4 border-b border-zinc-800">
-        <h1 className="font-bold text-lg">
-          {thread.listing.title}
-        </h1>
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
 
-        <p className="text-sm text-zinc-400">
-          Chat with{" "}
-          {currentUserId === thread.buyerId
-            ? thread.seller.name ?? "Seller"
-            : thread.buyer.name ?? "Buyer"}
-        </p>
+  return (
+    <div className="max-w-2xl mx-auto h-[calc(100vh-64px)] flex flex-col">
+      {/* Header */}
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-800 bg-zinc-950">
+        <Link href="/profile/messages" className="text-zinc-400 hover:text-white mr-1">
+          ←
+        </Link>
+
+        {other.image ? (
+          <Image
+            src={other.image}
+            alt={other.name ?? "User"}
+            width={36}
+            height={36}
+            className="rounded-full"
+          />
+        ) : (
+          <div className="w-9 h-9 rounded-full bg-zinc-700 flex items-center justify-center text-sm text-zinc-300">
+            {other.name?.[0] ?? "?"}
+          </div>
+        )}
+
+        <div>
+          <p className="font-semibold text-white text-sm">{other.name ?? "Unknown"}</p>
+          <Link
+            href={`/listings/${thread.listing.id}`}
+            className="text-xs text-zinc-400 hover:text-emerald-400 transition"
+          >
+            {thread.listing.title}
+          </Link>
+        </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-black">
+        {messages.length === 0 && (
+          <p className="text-center text-zinc-600 text-sm mt-8">
+            No messages yet. Say hello!
+          </p>
+        )}
+
         {messages.map((msg) => {
-          const isMine =
-            msg.fromId === currentUserId;
+          const isMine = msg.fromId === currentUserId;
+          const isTemp = msg.id.startsWith("temp-");
 
           return (
             <div
               key={msg.id}
-              className={`flex ${
-                isMine
-                  ? "justify-end"
-                  : "justify-start"
-              }`}
+              className={`flex ${isMine ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[70%] px-4 py-2 rounded-2xl text-sm ${
+                className={`max-w-[72%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                   isMine
-                    ? "bg-emerald-600"
-                    : "bg-zinc-800"
+                    ? `bg-emerald-600 text-white ${isTemp ? "opacity-60" : ""}`
+                    : "bg-zinc-800 text-zinc-100"
                 }`}
               >
                 {msg.content}
@@ -185,24 +190,21 @@ export default function ChatClient({
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t border-zinc-800 flex gap-2">
+      <div className="px-4 py-3 border-t border-zinc-800 bg-zinc-950 flex gap-2 items-center">
         <input
           value={text}
-          onChange={(e) =>
-            setText(e.target.value)
-          }
-          placeholder="Type a message..."
-          className="flex-1 bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-2 text-sm"
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Type a message…"
+          className="flex-1 bg-zinc-900 border border-zinc-700 rounded-full px-4 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-emerald-500"
         />
 
         <button
           onClick={sendMessage}
-          disabled={
-            loading || !text.trim()
-          }
-          className="bg-emerald-600 px-4 py-2 rounded-2xl disabled:bg-zinc-700"
+          disabled={loading || !text.trim()}
+          className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-700 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-full text-sm font-medium transition"
         >
-          {loading ? "Sending..." : "Send"}
+          {loading ? "…" : "Send"}
         </button>
       </div>
     </div>

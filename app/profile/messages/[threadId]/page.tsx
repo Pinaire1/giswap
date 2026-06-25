@@ -25,9 +25,9 @@ export default async function ThreadPage({
         id: threadId,
       },
       include: {
-        listing: true,
-        buyer: true,
-        seller: true,
+        listing: { select: { id: true, title: true, images: true } },
+        buyer: { select: { id: true, name: true, image: true } },
+        seller: { select: { id: true, name: true, image: true } },
         messages: {
           include: {
             from: true,

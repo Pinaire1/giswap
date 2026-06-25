@@ -3,53 +3,70 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { pusherServer } from "@/lib/pusher";
 
-export async function POST(request: NextRequest) {
-  try {
-    const session = await auth();
+// GET /api/messages — fetch all threads for the current user
+export async function GET() {
+  const session = await auth();
 
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-    const { sellerId, listingId, content } =
-      await request.json();
+  const userId = session.user.id;
 
-    if (!sellerId || !content) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
-    }
-
-    const message = await prisma.message.create({
-      data: {
-        content,
-        fromId: session.user.id,
-        toId: sellerId,
-        listingId,
+  const threads = await prisma.messageThread.findMany({
+    where: {
+      OR: [{ buyerId: userId }, { sellerId: userId }],
+    },
+    include: {
+      listing: { select: { id: true, title: true, images: true } },
+      buyer: { select: { id: true, name: true, image: true } },
+      seller: { select: { id: true, name: true, image: true } },
+      messages: {
+        orderBy: { createdAt: "desc" },
+        take: 1,
       },
-    });
+    },
+    orderBy: { createdAt: "desc" },
+  });
 
-    // 🔥 REALTIME PUSH
-    await pusherServer.trigger(
-      `listing-${listingId}`,
-      "new-message",
-      message
-    );
+  return NextResponse.json({ threads });
+}
 
-    return NextResponse.json({
-      success: true,
-      message,
-    });
-  } catch (error) {
-    console.error("Message error:", error);
+// POST /api/messages — send a message (creates thread if needed)
+export async function POST(req: NextRequest) {
+  const session = await auth();
 
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { listingId, sellerId, content } = await req.json();
+
+  if (!listingId || !sellerId || !content?.trim()) {
+    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+  }
+
+  const buyerId = session.user.id;
+
+  if (buyerId === sellerId) {
     return NextResponse.json(
-      { error: "Failed to send message" },
-      { status: 500 }
+      { error: "Cannot message yourself" },
+      { status: 400 }
     );
   }
+
+  const thread = await prisma.messageThread.upsert({
+    where: { listingId_buyerId_sellerId: { listingId, buyerId, sellerId } },
+    create: { listingId, buyerId, sellerId },
+    update: {},
+  });
+
+  const message = await prisma.message.create({
+    data: { content, fromId: buyerId, threadId: thread.id },
+    include: { from: { select: { id: true, name: true, image: true } } },
+  });
+
+  await pusherServer.trigger(`thread-${thread.id}`, "new-message", message);
+
+  return NextResponse.json({ success: true, thread, message });
 }

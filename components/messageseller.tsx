@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface MessageSellerProps {
   sellerName: string;
@@ -13,67 +14,56 @@ export default function MessageSeller({
   listingId,
   sellerName,
 }: MessageSellerProps) {
+  const router = useRouter();
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
 
   const sendMessage = async () => {
     if (!message.trim()) return;
 
     setIsSending(true);
+    setError("");
 
     try {
       const res = await fetch("/api/messages", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          sellerId,
-          listingId,
-          content: message,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sellerId, listingId, content: message }),
       });
 
-      if (res.ok) {
-        setSent(true);
-        setMessage("");
-        setTimeout(() => setSent(false), 5000);
+      const data = await res.json();
+
+      if (res.ok && data?.thread?.id) {
+        router.push(`/profile/messages/${data.thread.id}`);
       } else {
-        alert("Failed to send message");
+        setError(data?.error ?? "Failed to send message");
       }
-    } catch (error) {
-      console.error(error);
-      alert("Error sending message. Please try again.");
+    } catch {
+      setError("Error sending message. Please try again.");
     } finally {
       setIsSending(false);
     }
   };
 
   return (
-    <div className="mt-4">
-      {!sent ? (
-        <div className="space-y-3">
-          <textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder={`Hi ${sellerName}, I'm interested in this listing...`}
-            className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-2xl text-sm h-24 resize-y focus:outline-none focus:border-emerald-500"
-          />
+    <div className="mt-4 space-y-3">
+      <textarea
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder={`Hi ${sellerName}, I'm interested in this listing…`}
+        className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-2xl text-sm h-24 resize-y focus:outline-none focus:border-emerald-500"
+      />
 
-          <button
-            onClick={sendMessage}
-            disabled={isSending || !message.trim()}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-zinc-700 text-white py-3 rounded-2xl font-medium transition"
-          >
-            {isSending ? "Sending..." : "Send Message to Seller"}
-          </button>
-        </div>
-      ) : (
-        <div className="text-emerald-400 text-center py-4 font-medium bg-emerald-950/30 rounded-2xl">
-          Message sent successfully! 🎉
-        </div>
-      )}
+      {error && <p className="text-red-400 text-xs">{error}</p>}
+
+      <button
+        onClick={sendMessage}
+        disabled={isSending || !message.trim()}
+        className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-zinc-700 text-white py-3 rounded-2xl font-medium transition"
+      >
+        {isSending ? "Sending…" : "Send Message to Seller"}
+      </button>
     </div>
   );
 }

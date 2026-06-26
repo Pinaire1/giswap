@@ -35,7 +35,7 @@ export default function EditListingForm({ listing }: { listing: ListingData }) {
   const [error, setError] = useState("");
 
   const inputClass =
-    "w-full p-4 bg-[#0d0d0d] border border-[#1e2a4a] rounded-2xl text-white placeholder:text-gray-600 focus:border-blue-600 focus:outline-none transition";
+    "w-full p-4 bg-[#0d0d0d] border border-[#1e2a4a] rounded-2xl text-white placeholder:text-gray-500 focus:border-blue-600 focus:outline-none transition";
   const labelClass = "block text-sm font-medium mb-2 text-gray-400";
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,10 +81,12 @@ export default function EditListingForm({ listing }: { listing: ListingData }) {
       <form
         onSubmit={handleSubmit}
         className="space-y-8 bg-[#111] p-10 rounded-3xl border border-[#1e2a4a]"
+        aria-busy={saving}
       >
         <div>
-          <label className={labelClass}>Brand</label>
+          <label htmlFor="edit-brand" className={labelClass}>Brand</label>
           <input
+            id="edit-brand"
             value={brand}
             onChange={(e) => setBrand(e.target.value)}
             className={inputClass}
@@ -94,8 +96,9 @@ export default function EditListingForm({ listing }: { listing: ListingData }) {
         </div>
 
         <div>
-          <label className={labelClass}>Size</label>
+          <label htmlFor="edit-size" className={labelClass}>Size</label>
           <select
+            id="edit-size"
             value={size}
             onChange={(e) => setSize(e.target.value)}
             className={inputClass}
@@ -109,8 +112,8 @@ export default function EditListingForm({ listing }: { listing: ListingData }) {
           </select>
         </div>
 
-        <div>
-          <label className={labelClass}>Condition</label>
+        <fieldset>
+          <legend className={`${labelClass} px-0`}>Condition</legend>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {CONDITIONS.map(({ label, accent }) => (
               <label
@@ -133,11 +136,12 @@ export default function EditListingForm({ listing }: { listing: ListingData }) {
               </label>
             ))}
           </div>
-        </div>
+        </fieldset>
 
         <div>
-          <label className={labelClass}>Price ($)</label>
+          <label htmlFor="edit-price" className={labelClass}>Price ($)</label>
           <input
+            id="edit-price"
             type="number"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
@@ -148,8 +152,9 @@ export default function EditListingForm({ listing }: { listing: ListingData }) {
         </div>
 
         <div>
-          <label className={labelClass}>Description</label>
+          <label htmlFor="edit-description" className={labelClass}>Description</label>
           <textarea
+            id="edit-description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className={`${inputClass} h-32 resize-none`}
@@ -158,8 +163,8 @@ export default function EditListingForm({ listing }: { listing: ListingData }) {
         </div>
 
         <div>
-          <label className={labelClass}>Photos</label>
-          <div className="bg-[#0d0d0d] border border-[#1e2a4a] rounded-2xl p-4">
+          <span id="edit-photos-label" className={labelClass}>Photos</span>
+          <div className="bg-[#0d0d0d] border border-[#1e2a4a] rounded-2xl p-4" aria-labelledby="edit-photos-label">
             <UploadButton
               endpoint="giImageUploader"
               onClientUploadComplete={(res) => {
@@ -174,14 +179,15 @@ export default function EditListingForm({ listing }: { listing: ListingData }) {
           {images.length > 0 && (
             <div className="flex flex-wrap gap-3 mt-4">
               {images.map((url, i) => (
-                <div key={i} className="relative group">
+                <div key={i} className="relative group focus-within:opacity-100">
                   <div className="relative w-24 h-24 rounded-2xl overflow-hidden border border-blue-900">
-                    <Image src={url} alt={`photo ${i + 1}`} fill className="object-cover" />
+                    <Image src={url} alt={`Listing photo ${i + 1}`} fill className="object-cover" />
                   </div>
                   <button
                     type="button"
                     onClick={() => setImages((prev) => prev.filter((_, idx) => idx !== i))}
-                    className="absolute -top-2 -right-2 w-5 h-5 bg-red-600 rounded-full text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                    aria-label={`Remove photo ${i + 1}`}
+                    className="absolute -top-2 -right-2 w-5 h-5 bg-red-600 rounded-full text-white text-xs flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 transition"
                   >
                     ×
                   </button>
@@ -191,7 +197,11 @@ export default function EditListingForm({ listing }: { listing: ListingData }) {
           )}
         </div>
 
-        {error && <p className="text-red-400 text-sm">{error}</p>}
+        {error && (
+          <p role="alert" className="text-red-400 text-sm">
+            {error}
+          </p>
+        )}
 
         <div className="flex gap-3">
           <button
@@ -204,7 +214,8 @@ export default function EditListingForm({ listing }: { listing: ListingData }) {
           <button
             type="submit"
             disabled={saving}
-            className="flex-1 bg-blue-700 hover:bg-blue-600 disabled:bg-[#1a1a1a] disabled:text-gray-600 text-white py-4 rounded-2xl font-black transition"
+            aria-busy={saving}
+            className="flex-1 bg-blue-700 hover:bg-blue-600 disabled:bg-[#1a1a1a] disabled:text-gray-400 text-white py-4 rounded-2xl font-black transition"
           >
             {saving ? "Saving…" : "Save Changes"}
           </button>

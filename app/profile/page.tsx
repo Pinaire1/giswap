@@ -23,7 +23,7 @@ export default async function ProfilePage() {
   if (!user) return <div className="p-10 text-gray-500">User not found.</div>;
 
   return (
-    <main className="max-w-6xl mx-auto px-6 py-12">
+    <div className="max-w-6xl mx-auto px-6 py-12">
       {/* Profile Header */}
       <div className="bg-[#111] border border-[#1e2a4a] rounded-3xl p-8 mb-10">
         <div className="belt-gradient h-0.5 w-16 rounded-full mb-6 opacity-60" />
@@ -31,7 +31,7 @@ export default async function ProfilePage() {
           {user.image ? (
             <Image
               src={user.image}
-              alt={user.name ?? "Profile"}
+              alt={user.name ? `${user.name}'s profile photo` : "Your profile photo"}
               width={80}
               height={80}
               className="rounded-full ring-2 ring-blue-700"
@@ -89,9 +89,9 @@ export default async function ProfilePage() {
         </div>
 
         <div className="bg-[#111] border border-[#1e2a4a] rounded-3xl p-8 text-center">
-          <p className="text-gray-600 text-sm">Go to your inbox to read and reply to messages.</p>
+          <p className="text-gray-400 text-sm">Go to your inbox to read and reply to messages.</p>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

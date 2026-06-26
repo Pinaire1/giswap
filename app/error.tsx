@@ -16,7 +16,7 @@ export default function GlobalError({
 
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center px-6 text-center">
-      <p className="text-8xl mb-6 opacity-20">⚠️</p>
+      <p className="text-8xl mb-6 opacity-20" aria-hidden="true">⚠️</p>
       <h2 className="text-4xl font-black text-white mb-3">Something went wrong</h2>
       <p className="text-gray-500 mb-8">An unexpected error occurred. Please try again.</p>
       <div className="flex gap-4">

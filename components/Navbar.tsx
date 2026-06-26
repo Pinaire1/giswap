@@ -41,7 +41,7 @@ export default function Navbar() {
                   {session.user?.image ? (
                     <Image
                       src={session.user.image}
-                      alt="Profile"
+                      alt={session.user.name ? `${session.user.name}'s profile photo` : "Your profile photo"}
                       width={32}
                       height={32}
                       className="rounded-full ring-2 ring-blue-700"

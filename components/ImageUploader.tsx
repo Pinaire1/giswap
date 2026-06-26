@@ -5,9 +5,10 @@ import type { OurFileRouter } from "@/app/api/uploadthing/core";
 
 interface Props {
   onComplete: (urls: string[]) => void;
+  onError?: (message: string) => void;
 }
 
-export default function ImageUploader({ onComplete }: Props) {
+export default function ImageUploader({ onComplete, onError }: Props) {
   return (
     <UploadButton<OurFileRouter, "giImageUploader">
       endpoint="giImageUploader"
@@ -16,7 +17,7 @@ export default function ImageUploader({ onComplete }: Props) {
         onComplete(urls);
       }}
       onUploadError={(error) => {
-        alert(error.message);
+        onError?.(error.message);
       }}
     />
   );

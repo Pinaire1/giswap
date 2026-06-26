@@ -101,7 +101,7 @@ export default function DashboardPage() {
               + New Listing
             </Link>
           </div>
-          <p className="text-gray-600 text-center py-12">
+          <p className="text-gray-400 text-center py-12">
             <Link href="/profile" className="text-blue-400 hover:underline">
               View &amp; manage your listings →
             </Link>
@@ -110,7 +110,7 @@ export default function DashboardPage() {
 
         <div className="bg-[#111] border border-[#1e2a4a] rounded-3xl p-8">
           <h2 className="text-2xl font-bold text-white mb-6">Messages</h2>
-          <p className="text-gray-600 text-center py-12">
+          <p className="text-gray-400 text-center py-12">
             <Link
               href="/profile/messages"
               className="text-purple-400 hover:underline"

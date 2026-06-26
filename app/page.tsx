@@ -23,7 +23,7 @@ export default function Home() {
 
         <div className="relative z-10 text-center px-6 max-w-5xl">
           <div className="hero-badge inline-flex items-center gap-2 px-4 py-1.5 bg-blue-900/40 border border-blue-700/50 rounded-full text-blue-300 text-sm font-medium mb-8 tracking-wide">
-            🥋 The BJJ Gi Marketplace
+            <span aria-hidden="true">🥋</span> The BJJ Gi Marketplace
           </div>
 
           <h1 className="hero-h1 text-5xl sm:text-7xl md:text-8xl font-black tracking-tighter text-white mb-4 leading-none">

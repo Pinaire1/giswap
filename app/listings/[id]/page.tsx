@@ -110,7 +110,7 @@ export default async function ListingPage({
                 priority
               />
             ) : (
-              <div className="h-full flex items-center justify-center text-8xl opacity-20">
+              <div className="h-full flex items-center justify-center text-8xl opacity-20" aria-hidden="true">
                 🥋
               </div>
             )}

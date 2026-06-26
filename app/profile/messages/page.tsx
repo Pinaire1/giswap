@@ -34,9 +34,9 @@ export default async function MessagesPage() {
 
       {threads.length === 0 ? (
         <div className="bg-[#111] border border-[#1e2a4a] rounded-3xl p-12 text-center">
-          <p className="text-5xl mb-4 opacity-20">💬</p>
+          <p className="text-5xl mb-4 opacity-20" aria-hidden="true">💬</p>
           <p className="text-gray-500">No messages yet.</p>
-          <p className="text-gray-600 text-sm mt-2">Browse listings and message a seller to get started.</p>
+          <p className="text-gray-400 text-sm mt-2">Browse listings and message a seller to get started.</p>
           <Link href="/listings" className="mt-4 inline-block text-blue-400 hover:underline text-sm">
             Browse Gis →
           </Link>
@@ -74,14 +74,14 @@ export default async function MessagesPage() {
                         {other.name ?? "Unknown"}
                       </span>
                       {lastMsg && (
-                        <span className="text-xs text-gray-600 ml-2 flex-shrink-0">
+                        <span className="text-xs text-gray-400 ml-2 flex-shrink-0">
                           {formatDistanceToNow(new Date(lastMsg.createdAt), { addSuffix: true })}
                         </span>
                       )}
                     </div>
                     <p className="text-xs text-blue-400/70 truncate mt-0.5">{thread.listing.title}</p>
                     {lastMsg && (
-                      <p className="text-xs text-gray-600 truncate mt-0.5">{lastMsg.content}</p>
+                      <p className="text-xs text-gray-400 truncate mt-0.5">{lastMsg.content}</p>
                     )}
                   </div>
                 </Link>

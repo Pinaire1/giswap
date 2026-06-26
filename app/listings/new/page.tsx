@@ -22,14 +22,19 @@ export default function NewListingPage() {
   const [selectedBrand, setSelectedBrand] = useState("");
   const [customBrand, setCustomBrand] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/login");
   }, [status, router]);
 
-  if (status === "loading") return (
-    <div className="min-h-screen flex items-center justify-center text-gray-500">Loading...</div>
-  );
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-400" role="status">
+        Loading...
+      </div>
+    );
+  }
   if (!session) return null;
 
   const brand = selectedBrand === "Other" ? customBrand : selectedBrand;
@@ -38,6 +43,7 @@ export default function NewListingPage() {
     e.preventDefault();
     if (!selectedSize) return;
     setIsSubmitting(true);
+    setError("");
 
     const formData = new FormData(e.currentTarget);
     const data = {
@@ -62,17 +68,17 @@ export default function NewListingPage() {
       if (res.ok) {
         router.push(`/listings/${result.listing.id}`);
       } else {
-        alert("Failed to post gi. Please try again.");
+        setError("Failed to post gi. Please try again.");
         setIsSubmitting(false);
       }
-    } catch (error) {
-      console.error(error);
-      alert("Error posting gi. Please try again.");
+    } catch (err) {
+      console.error(err);
+      setError("Error posting gi. Please try again.");
       setIsSubmitting(false);
     }
   };
 
-  const inputClass = "w-full p-4 bg-[#0d0d0d] border border-[#1e2a4a] rounded-2xl text-white placeholder:text-gray-600 focus:border-blue-600 focus:outline-none transition";
+  const inputClass = "w-full p-4 bg-[#0d0d0d] border border-[#1e2a4a] rounded-2xl text-white placeholder:text-gray-500 focus:border-blue-600 focus:outline-none transition";
   const labelClass = "block text-sm font-medium mb-2 text-gray-400";
   const chipBase = "border-2 border-[#1e2a4a] bg-[#0d0d0d] hover:bg-[#161626] rounded-2xl px-3 py-3 cursor-pointer text-center transition-all font-medium text-gray-400 min-h-[44px] flex items-center justify-center";
   const chipActive = "border-blue-600 text-blue-300 bg-[#0d0d20]";
@@ -95,10 +101,11 @@ export default function NewListingPage() {
         className="space-y-8 bg-[#111] p-5 sm:p-10 rounded-3xl border border-[#1e2a4a]"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
+        aria-busy={isSubmitting}
       >
         {/* Brand */}
-        <div>
-          <label className={labelClass}>Brand</label>
+        <fieldset>
+          <legend className={`${labelClass} px-0`}>Brand</legend>
           <div className="flex flex-wrap gap-2">
             {[...COMMON_BRANDS, "Other"].map((b) => (
               <motion.button
@@ -106,6 +113,7 @@ export default function NewListingPage() {
                 type="button"
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedBrand(b)}
+                aria-pressed={selectedBrand === b}
                 className={`${chipBase} ${selectedBrand === b ? chipActive : ""}`}
               >
                 {b}
@@ -113,23 +121,28 @@ export default function NewListingPage() {
             ))}
           </div>
           {selectedBrand === "Other" && (
-            <input
-              type="text"
-              className={`${inputClass} mt-3`}
-              placeholder="Enter brand name"
-              value={customBrand}
-              onChange={(e) => setCustomBrand(e.target.value)}
-              required
-              autoFocus
-            />
+            <>
+              <label htmlFor="custom-brand" className="sr-only">
+                Custom brand name
+              </label>
+              <input
+                id="custom-brand"
+                type="text"
+                className={`${inputClass} mt-3`}
+                placeholder="Enter brand name"
+                value={customBrand}
+                onChange={(e) => setCustomBrand(e.target.value)}
+                required
+                autoFocus
+              />
+            </>
           )}
-          {/* hidden input so form validation picks up brand */}
           <input type="hidden" name="brand" value={brand} required />
-        </div>
+        </fieldset>
 
         {/* Size */}
-        <div>
-          <label className={labelClass}>Size</label>
+        <fieldset>
+          <legend className={`${labelClass} px-0`}>Size</legend>
           <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
             {SIZES.map((s) => (
               <motion.button
@@ -137,6 +150,7 @@ export default function NewListingPage() {
                 type="button"
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedSize(s)}
+                aria-pressed={selectedSize === s}
                 className={`${chipBase} ${selectedSize === s ? chipActive : ""}`}
               >
                 {s}
@@ -144,11 +158,11 @@ export default function NewListingPage() {
             ))}
           </div>
           <input type="hidden" name="size" value={selectedSize} required />
-        </div>
+        </fieldset>
 
         {/* Condition */}
-        <div>
-          <label className={labelClass}>Condition</label>
+        <fieldset>
+          <legend className={`${labelClass} px-0`}>Condition</legend>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
               { label: "New",       accent: "border-blue-600 text-blue-300" },
@@ -167,12 +181,13 @@ export default function NewListingPage() {
               </motion.label>
             ))}
           </div>
-        </div>
+        </fieldset>
 
         {/* Price */}
         <div>
-          <label className={labelClass}>Price ($)</label>
+          <label htmlFor="listing-price" className={labelClass}>Price ($)</label>
           <input
+            id="listing-price"
             name="price"
             type="number"
             className={inputClass}
@@ -184,15 +199,15 @@ export default function NewListingPage() {
 
         {/* Photos */}
         <div>
-          <label className={labelClass}>Photos (max 5)</label>
-          <div className="bg-[#0d0d0d] border border-[#1e2a4a] rounded-2xl p-4">
+          <span id="photos-label" className={labelClass}>Photos (max 5)</span>
+          <div className="bg-[#0d0d0d] border border-[#1e2a4a] rounded-2xl p-4" aria-labelledby="photos-label">
             <UploadButton
               endpoint="giImageUploader"
               onClientUploadComplete={(res) => {
-                const urls = res.map((r: any) => r.url); // eslint-disable-line @typescript-eslint/no-explicit-any
+                const urls = res.map((r: { url: string }) => r.url);
                 setUploadedImages((prev) => [...prev, ...urls]);
               }}
-              onUploadError={(error: Error) => alert(`Upload failed: ${error.message}`)}
+              onUploadError={(uploadError: Error) => setError(`Upload failed: ${uploadError.message}`)}
               className="ut-button:bg-blue-700 ut-button:hover:bg-blue-600 ut-button:rounded-xl ut-button:font-semibold"
             />
           </div>
@@ -200,29 +215,38 @@ export default function NewListingPage() {
             <div className="flex flex-wrap gap-3 mt-3">
               {uploadedImages.map((url, i) => (
                 <div key={i} className="relative w-24 h-24 rounded-2xl overflow-hidden border border-blue-900">
-                  <Image src={url} alt={`uploaded ${i}`} fill className="object-cover" />
+                  <Image src={url} alt={`Listing photo ${i + 1}`} fill className="object-cover" />
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* Description — optional, last */}
+        {/* Description */}
         <div>
-          <label className={labelClass}>Description <span className="text-gray-600">(optional)</span></label>
+          <label htmlFor="listing-description" className={labelClass}>
+            Description <span className="text-gray-400">(optional)</span>
+          </label>
           <textarea
+            id="listing-description"
             name="description"
             className={`${inputClass} h-32 resize-none`}
             placeholder="How many times used, any repairs, patches, etc..."
           />
         </div>
 
+        {error && (
+          <p role="alert" className="text-red-400 text-sm">
+            {error}
+          </p>
+        )}
+
         <motion.button
           type="submit"
           disabled={isSubmitting || !brand || !selectedSize}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
-          className="w-full bg-blue-700 hover:bg-blue-600 disabled:bg-[#1a1a1a] disabled:text-gray-600 text-white py-5 rounded-2xl font-black text-xl tracking-wider transition"
+          className="w-full bg-blue-700 hover:bg-blue-600 disabled:bg-[#1a1a1a] disabled:text-gray-400 text-white py-5 rounded-2xl font-black text-xl tracking-wider transition"
         >
           {isSubmitting ? "THROWING ON THE MAT…" : "POST TO THE MAT"}
         </motion.button>

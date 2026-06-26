@@ -14,7 +14,7 @@ export default function ImageGallery({
 
   if (!images?.length) {
     return (
-      <div className="aspect-square bg-[#111] rounded-2xl sm:rounded-3xl overflow-hidden border border-[#1e2a4a] flex items-center justify-center text-8xl opacity-20">
+      <div className="aspect-square bg-[#111] rounded-2xl sm:rounded-3xl overflow-hidden border border-[#1e2a4a] flex items-center justify-center text-8xl opacity-20" aria-hidden="true">
         🥋
       </div>
     );
@@ -33,10 +33,14 @@ export default function ImageGallery({
       </div>
 
       {images.length > 1 && (
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-2" role="tablist" aria-label={`${title} photos`}>
           {images.map((img, i) => (
             <button
               key={i}
+              type="button"
+              role="tab"
+              aria-selected={i === active}
+              aria-label={`View photo ${i + 1} of ${images.length}`}
               onClick={() => setActive(i)}
               className={`aspect-square rounded-xl overflow-hidden border relative transition-all ${
                 i === active

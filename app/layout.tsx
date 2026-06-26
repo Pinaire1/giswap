@@ -35,8 +35,11 @@ export default function RootLayout({
       <body className="min-h-screen bg-[#0a0a0a] font-sans antialiased">
         <Providers>
           <SessionProvider>
+            <a href="#main-content" className="skip-link">
+              Skip to main content
+            </a>
             <Navbar />
-            <main>
+            <main id="main-content">
               {children}
             </main>
 
@@ -49,7 +52,7 @@ export default function RootLayout({
                   GiSwap
                 </p>
                 <p className="text-sm">© 2026 GiSwap • Built for the BJJ Community</p>
-                <p className="text-xs text-zinc-700 mt-2">
+                <p className="text-xs text-gray-400 mt-2">
                   OSS · No Ego · Keep Rolling
                 </p>
               </div>

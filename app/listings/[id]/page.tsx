@@ -179,7 +179,7 @@ export default async function ListingPage({
               <p className="text-white font-semibold text-sm truncate">
                 {listing.user.name ?? "Seller"}
               </p>
-              <p className="text-gray-600 text-xs">
+              <p className="text-gray-400 text-xs">
                 {listing.user._count.listings} listing{listing.user._count.listings !== 1 ? "s" : ""} available
               </p>
             </div>

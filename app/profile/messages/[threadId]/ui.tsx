@@ -38,6 +38,7 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const inputId = `chat-input-${thread.id}`;
 
   const isBuyer = currentUserId === thread.buyerId;
   const other = isBuyer ? thread.seller : thread.buyer;
@@ -108,7 +109,11 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
     <div className="max-w-2xl mx-auto h-[calc(100vh-64px)] flex flex-col">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-[#1e2a4a] bg-[#0d0d0d]">
-        <Link href="/profile/messages" className="text-gray-500 hover:text-blue-400 mr-1 transition text-lg">
+        <Link
+          href="/profile/messages"
+          aria-label="Back to messages"
+          className="text-gray-400 hover:text-blue-400 mr-1 transition text-lg"
+        >
           ←
         </Link>
 
@@ -121,7 +126,7 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
             className="rounded-full ring-1 ring-blue-800"
           />
         ) : (
-          <div className="w-9 h-9 rounded-full bg-blue-950 border border-blue-800 flex items-center justify-center text-sm text-blue-400">
+          <div className="w-9 h-9 rounded-full bg-blue-950 border border-blue-800 flex items-center justify-center text-sm text-blue-400" aria-hidden="true">
             {other.name?.[0] ?? "?"}
           </div>
         )}
@@ -138,9 +143,15 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-[#0a0a0a]">
+      <div
+        role="log"
+        aria-live="polite"
+        aria-relevant="additions"
+        aria-label={`Conversation with ${other.name ?? "Unknown"}`}
+        className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-[#0a0a0a]"
+      >
         {messages.length === 0 && (
-          <p className="text-center text-gray-700 text-sm mt-8">No messages yet. Say hello!</p>
+          <p className="text-center text-gray-400 text-sm mt-8">No messages yet. Say hello!</p>
         )}
 
         {messages.map((msg) => {
@@ -155,6 +166,7 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
                     ? `bg-blue-700 text-white ${isTemp ? "opacity-60" : ""}`
                     : "bg-[#1a1a2e] border border-[#1e2a4a] text-gray-200"
                 }`}
+                aria-busy={isTemp || undefined}
               >
                 {msg.content}
               </div>
@@ -167,18 +179,24 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
 
       {/* Input */}
       <div className="px-4 py-3 border-t border-[#1e2a4a] bg-[#0d0d0d] flex gap-2 items-center">
+        <label htmlFor={inputId} className="sr-only">
+          Type a message to {other.name ?? "Unknown"}
+        </label>
         <input
+          id={inputId}
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Type a message…"
-          className="flex-1 bg-[#111] border border-[#1e2a4a] rounded-full px-4 py-2.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-blue-600 transition"
+          className="flex-1 bg-[#111] border border-[#1e2a4a] rounded-full px-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-blue-600 transition"
         />
 
         <button
+          type="button"
           onClick={sendMessage}
           disabled={loading || !text.trim()}
-          className="bg-blue-700 hover:bg-blue-600 disabled:bg-[#1a1a1a] disabled:text-gray-600 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-full text-sm font-semibold transition"
+          aria-busy={loading}
+          className="bg-blue-700 hover:bg-blue-600 disabled:bg-[#1a1a1a] disabled:text-gray-400 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-full text-sm font-semibold transition"
         >
           {loading ? "…" : "Send"}
         </button>

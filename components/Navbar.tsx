@@ -83,7 +83,10 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden text-white text-2xl focus:outline-none"
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isOpen}
+            aria-controls="mobile-menu"
+            className="md:hidden text-white text-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
           >
             {isOpen ? "✕" : "☰"}
           </button>
@@ -91,7 +94,7 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden py-6 border-t border-[#1e2a4a]">
+          <div id="mobile-menu" className="md:hidden py-6 border-t border-[#1e2a4a]">
             <div className="flex flex-col gap-5 text-base text-gray-300">
               <Link href="/listings" onClick={() => setIsOpen(false)} className="hover:text-blue-400 transition">Browse Gis</Link>
               <Link href="/listings/new" onClick={() => setIsOpen(false)} className="hover:text-blue-400 transition">Sell Your Gi</Link>

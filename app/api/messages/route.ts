@@ -40,9 +40,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { listingId, sellerId, content } = await req.json();
+  const body = await req.json();
+  const listingId = String(body.listingId ?? "").trim();
+  const sellerId = String(body.sellerId ?? "").trim();
+  const content = String(body.content ?? "").trim().slice(0, 2000);
 
-  if (!listingId || !sellerId || !content?.trim()) {
+  if (!listingId || !sellerId || !content) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
 

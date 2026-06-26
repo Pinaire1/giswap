@@ -159,6 +159,9 @@ export default function ListingsGrid({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Message seller"
             className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
             onClick={(e: React.MouseEvent<HTMLDivElement>) => {
               if (e.target === e.currentTarget) setMessagingListing(null);
@@ -182,6 +185,7 @@ export default function ListingsGrid({
                 </div>
                 <button
                   onClick={() => setMessagingListing(null)}
+                  aria-label="Close message dialog"
                   className="text-gray-600 hover:text-white text-2xl leading-none transition"
                 >
                   ×

@@ -8,6 +8,8 @@ import ReportButton from "@/components/ReportButton";
 import PaySeller from "@/components/PaySeller";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://giswap.vercel.app";
 
 export async function generateMetadata({

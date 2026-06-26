@@ -64,12 +64,18 @@ export default function ReportButton({ listingId }: { listingId: string }) {
       </button>
 
       {open && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="report-dialog-title"
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+        >
           <div className="bg-[#111] border border-[#1e2a4a] rounded-t-3xl sm:rounded-3xl p-6 w-full sm:max-w-sm shadow-2xl">
             <div className="flex justify-between items-center mb-5">
-              <h3 className="font-bold text-white">Report Listing</h3>
+              <h3 id="report-dialog-title" className="font-bold text-white">Report Listing</h3>
               <button
                 onClick={() => setOpen(false)}
+                aria-label="Close report dialog"
                 className="text-gray-600 hover:text-white text-xl leading-none transition"
               >
                 ×

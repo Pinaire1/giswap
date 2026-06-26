@@ -9,6 +9,7 @@ const securityHeaders = [
 
 const nextConfig = {
   images: {
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
       { protocol: "https", hostname: "utfs.io" },

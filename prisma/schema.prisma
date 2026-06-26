@@ -47,6 +47,7 @@ model User {
   sessions      Session[]
   sentMessages  Message[] @relation("SentMessages")
   reports       Report[]
+  savedListings SavedListing[]
 
   messageThreads MessageThread[] @relation("UserThreads")
   buyerThreads   MessageThread[] @relation("BuyerThreads")
@@ -80,6 +81,7 @@ model Listing {
   sellerEmail    String?
   messageThreads MessageThread[]
   reports        Report[]
+  savedListings  SavedListing[]
 }
 
 
@@ -120,6 +122,19 @@ model MessageThread {
   @@unique([listingId, buyerId, sellerId])
   @@index([buyerId])
   @@index([sellerId])
+}
+
+model SavedListing {
+  id        String   @id @default(cuid())
+  userId    String
+  listingId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+  @@index([userId])
 }
 
 model Report {

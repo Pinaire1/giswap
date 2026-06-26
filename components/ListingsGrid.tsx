@@ -76,14 +76,11 @@ export default function ListingsGrid({
               conditionColor[listing.condition] ?? conditionColor.Worn;
 
             return (
-              <motion.div
+              <div
                 key={listing.id}
-                initial={{ opacity: 0, y: 60 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: Math.min(index * 0.03, 0.3) }}
-                whileHover={{ y: -6, scale: 1.02 }}
+                className="card-in group bg-[#111] border border-[#1e2a4a] rounded-3xl overflow-hidden hover:border-blue-600 hover:shadow-lg hover:shadow-blue-900/30 hover:-translate-y-1.5 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                style={{ animationDelay: `${Math.min(index * 0.03, 0.3)}s` }}
                 onClick={() => router.push(`/listings/${listing.id}`)}
-                className="group bg-[#111] border border-[#1e2a4a] rounded-3xl overflow-hidden hover:border-blue-600 hover:shadow-lg hover:shadow-blue-900/30 transition-all duration-300 cursor-pointer"
               >
                 {/* Image */}
                 <div className="h-56 sm:h-60 bg-[#161616] relative overflow-hidden">
@@ -92,6 +89,7 @@ export default function ListingsGrid({
                       src={listing.images[0]}
                       alt={listing.title}
                       fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                       className="object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                   ) : (
@@ -146,7 +144,7 @@ export default function ListingsGrid({
                     )}
                   </div>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>

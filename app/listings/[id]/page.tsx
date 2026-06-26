@@ -105,6 +105,7 @@ export default async function ListingPage({
                 src={listing.images[0]}
                 alt={listing.title}
                 fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
                 priority
               />
@@ -126,6 +127,7 @@ export default async function ListingPage({
                     src={img}
                     alt={`${listing.title} photo ${i + 2}`}
                     fill
+                    sizes="(max-width: 1024px) 25vw, 12vw"
                     className="object-cover"
                   />
                 </div>

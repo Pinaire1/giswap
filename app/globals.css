@@ -158,3 +158,35 @@ body {
 @keyframes fadeUp {
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Hero entrance animations */
+@keyframes heroSlideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes heroSlideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes heroFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.hero-badge    { animation: heroSlideDown 0.5s ease both; }
+.hero-h1       { animation: heroSlideUp  0.5s ease 0.1s both; }
+.hero-tagline  { animation: heroSlideUp  0.5s ease 0.2s both; }
+.hero-desc     { animation: heroFadeIn   0.6s ease 0.4s both; }
+.hero-cta      { animation: heroFadeIn   0.6s ease 0.5s both; }
+
+/* Card stagger-in (replaces framer-motion) */
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(60px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card-in {
+  animation: cardIn 0.4s ease both;
+}

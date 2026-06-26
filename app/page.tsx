@@ -1,8 +1,5 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
 
 export default function Home() {
   return (
@@ -21,62 +18,40 @@ export default function Home() {
           fill
           className="object-cover opacity-30"
           priority
+          sizes="100vw"
         />
 
         <div className="relative z-10 text-center px-6 max-w-5xl">
-          <motion.div
-            initial={{ opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-900/40 border border-blue-700/50 rounded-full text-blue-300 text-sm font-medium mb-8 tracking-wide"
-          >
+          <div className="hero-badge inline-flex items-center gap-2 px-4 py-1.5 bg-blue-900/40 border border-blue-700/50 rounded-full text-blue-300 text-sm font-medium mb-8 tracking-wide">
             🥋 The BJJ Gi Marketplace
-          </motion.div>
+          </div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-7xl md:text-8xl font-black tracking-tighter text-white mb-4 leading-none"
-          >
+          <h1 className="hero-h1 text-5xl sm:text-7xl md:text-8xl font-black tracking-tighter text-white mb-4 leading-none">
             Roll Different.
-          </motion.h1>
+          </h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-5xl md:text-6xl font-black mb-10 belt-text"
-          >
+          <p className="hero-tagline text-3xl sm:text-5xl md:text-6xl font-black mb-10 belt-text">
             Buy. Sell. Share.
-          </motion.p>
+          </p>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-lg text-gray-400 mb-12 max-w-xl mx-auto"
-          >
+          <p className="hero-desc text-lg text-gray-400 mb-12 max-w-xl mx-auto">
             Built by grapplers, for grapplers. Find your next gi or give yours a new home.
-          </motion.p>
+          </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
-              <Link
-                href="/listings"
-                className="block px-10 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-lg font-bold transition shadow-lg shadow-blue-900/40"
-              >
-                Browse Gis
-              </Link>
-            </motion.div>
+          <div className="hero-cta flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/listings"
+              className="block px-10 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-lg font-bold transition shadow-lg shadow-blue-900/40 hover:scale-105 active:scale-[0.97]"
+            >
+              Browse Gis
+            </Link>
 
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
-              <Link
-                href="/listings/new"
-                className="block px-10 py-4 border-2 border-purple-600 text-purple-300 hover:bg-purple-900/30 rounded-2xl text-lg font-bold transition"
-              >
-                Sell Your Gi
-              </Link>
-            </motion.div>
+            <Link
+              href="/listings/new"
+              className="block px-10 py-4 border-2 border-purple-600 text-purple-300 hover:bg-purple-900/30 rounded-2xl text-lg font-bold transition hover:scale-105 active:scale-[0.97]"
+            >
+              Sell Your Gi
+            </Link>
           </div>
         </div>
 

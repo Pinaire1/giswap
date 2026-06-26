@@ -6,9 +6,24 @@ import { SessionProvider } from "next-auth/react";
 import Providers from "./providers";
 import { Analytics } from "@vercel/analytics/next";
 
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://giswap.vercel.app";
+
 export const metadata: Metadata = {
-  title: "GiSwap | BJJ Gi Marketplace",
-  description: "Buy and sell new & used BJJ gis",
+  metadataBase: new URL(BASE_URL),
+  title: { default: "GiSwap | BJJ Gi Marketplace", template: "%s | GiSwap" },
+  description: "Buy and sell new & used BJJ gis. The marketplace built by grapplers, for grapplers.",
+  openGraph: {
+    siteName: "GiSwap",
+    title: "GiSwap | BJJ Gi Marketplace",
+    description: "Buy and sell new & used BJJ gis. The marketplace built by grapplers, for grapplers.",
+    url: BASE_URL,
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GiSwap | BJJ Gi Marketplace",
+    description: "Buy and sell new & used BJJ gis.",
+  },
 };
 
 export default function RootLayout({

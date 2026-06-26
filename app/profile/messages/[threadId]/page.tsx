@@ -1,6 +1,9 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import ChatClient from "./ui";
+import { redirect, notFound } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 
 export default async function ThreadPage({
   params,
@@ -8,49 +11,27 @@ export default async function ThreadPage({
   params: Promise<{ threadId: string }>;
 }) {
   const { threadId } = await params;
-
   const session = await auth();
 
-  if (!session?.user?.id) {
-    return (
-      <div className="p-10 text-center">
-        Login required
-      </div>
-    );
-  }
+  if (!session?.user?.id) redirect("/login");
 
-  const thread =
-    await prisma.messageThread.findUnique({
-      where: {
-        id: threadId,
+  const thread = await prisma.messageThread.findUnique({
+    where: { id: threadId },
+    include: {
+      listing: { select: { id: true, title: true, images: true } },
+      buyer: { select: { id: true, name: true, image: true } },
+      seller: { select: { id: true, name: true, image: true } },
+      messages: {
+        include: { from: true },
+        orderBy: { createdAt: "asc" },
       },
-      include: {
-        listing: { select: { id: true, title: true, images: true } },
-        buyer: { select: { id: true, name: true, image: true } },
-        seller: { select: { id: true, name: true, image: true } },
-        messages: {
-          include: {
-            from: true,
-          },
-          orderBy: {
-            createdAt: "asc",
-          },
-        },
-      },
-    });
+    },
+  });
 
-  if (!thread) {
-    return (
-      <div className="p-10 text-center">
-        Thread not found
-      </div>
-    );
-  }
+  if (!thread) notFound();
 
-  return (
-    <ChatClient
-      thread={thread}
-      currentUserId={session.user.id}
-    />
-  );
+  const userId = session.user.id;
+  if (thread.buyerId !== userId && thread.sellerId !== userId) notFound();
+
+  return <ChatClient thread={thread} currentUserId={userId} />;
 }

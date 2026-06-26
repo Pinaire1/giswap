@@ -28,7 +28,9 @@ export default function NewListingPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Capture form values before any await — currentTarget is nullified after async
     const formData = new FormData(e.currentTarget);
+    const formEl = e.currentTarget;
     const data = {
       title: `${formData.get("brand")} ${formData.get("size")}`,
       brand: formData.get("brand"),
@@ -50,7 +52,7 @@ export default function NewListingPage() {
 
       if (res.ok) {
         setNewListing(result.listing);
-        e.currentTarget.reset();
+        formEl.reset();
         setUploadedImages([]);
       } else {
         alert("Failed to post gi. Please try again.");

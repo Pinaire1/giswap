@@ -17,8 +17,10 @@
     "@prisma/adapter-neon": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@uploadthing/react": "^7.3.3",
+    "@vercel/analytics": "^1.5.0",
     "bcryptjs": "^3.0.3",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.4.2",
     "framer-motion": "^12.39.0",
     "lucide-react": "^1.14.0",
     "next": "16.2.6",
@@ -30,8 +32,7 @@
     "react-dom": "19.2.4",
     "resend": "^6.12.4",
     "uploadthing": "^7.7.4",
-    "zod": "^4.4.3",
-    "@vercel/analytics": "^1.5.0"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

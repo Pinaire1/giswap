@@ -27,7 +27,15 @@ const conditionColor: Record<string, string> = {
   Worn:       "bg-zinc-800 text-zinc-400 border-zinc-700",
 };
 
-export default function ListingsGrid({ listings }: { listings: Listing[] }) {
+export default function ListingsGrid({
+  listings,
+  page = 0,
+  totalPages = 1,
+}: {
+  listings: Listing[];
+  page?: number;
+  totalPages?: number;
+}) {
   const { data: session } = useSession();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
@@ -189,6 +197,31 @@ export default function ListingsGrid({ listings }: { listings: Listing[] }) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-3 mt-16">
+          {page > 0 && (
+            <Link
+              href={`/listings?page=${page - 1}`}
+              className="px-5 py-2.5 bg-[#111] border border-[#1e2a4a] hover:border-blue-600 text-gray-400 hover:text-white rounded-xl text-sm font-medium transition"
+            >
+              ← Previous
+            </Link>
+          )}
+          <span className="text-gray-600 text-sm">
+            Page {page + 1} of {totalPages}
+          </span>
+          {page < totalPages - 1 && (
+            <Link
+              href={`/listings?page=${page + 1}`}
+              className="px-5 py-2.5 bg-[#111] border border-[#1e2a4a] hover:border-blue-600 text-gray-400 hover:text-white rounded-xl text-sm font-medium transition"
+            >
+              Next →
+            </Link>
+          )}
+        </div>
+      )}
     </>
   );
 }

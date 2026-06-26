@@ -3,7 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { auth } from "@/auth";
 
-async function ownsListing(userId: string, listingId: string) {
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "").split(",").map((e) => e.trim()).filter(Boolean);
+
+function isAdmin(email: string | null | undefined) {
+  return !!email && ADMIN_EMAILS.includes(email);
+}
+
+async function canModifyListing(userId: string, userEmail: string | null | undefined, listingId: string) {
+  if (isAdmin(userEmail)) return true;
   const listing = await prisma.listing.findUnique({
     where: { id: listingId },
     select: { userId: true },
@@ -23,7 +30,7 @@ export async function PATCH(
 
   const { id } = await params;
 
-  if (!(await ownsListing(session.user.id, id))) {
+  if (!(await canModifyListing(session.user.id, session.user.email, id))) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -55,7 +62,7 @@ export async function DELETE(
 
   const { id } = await params;
 
-  if (!(await ownsListing(session.user.id, id))) {
+  if (!(await canModifyListing(session.user.id, session.user.email, id))) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

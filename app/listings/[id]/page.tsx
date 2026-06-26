@@ -5,6 +5,48 @@ import Image from "next/image";
 import Link from "next/link";
 import MessageSeller from "@/components/messageseller";
 import ReportButton from "@/components/ReportButton";
+import PaySeller from "@/components/PaySeller";
+import type { Metadata } from "next";
+
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://giswap.vercel.app";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const listing = await prisma.listing.findUnique({
+    where: { id },
+    select: { title: true, brand: true, size: true, condition: true, price: true, description: true, images: true },
+  });
+  if (!listing) return { title: "Listing Not Found | GiSwap" };
+
+  const title = `${listing.title} — $${listing.price} | GiSwap`;
+  const description = listing.description
+    ? listing.description.slice(0, 160)
+    : `${listing.brand} ${listing.size} gi in ${listing.condition} condition for $${listing.price} on GiSwap.`;
+  const image = listing.images?.[0] ?? `${BASE_URL}/og-default.png`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `${BASE_URL}/listings/${id}`,
+      siteName: "GiSwap",
+      images: [{ url: image, width: 1200, height: 630, alt: listing.title }],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+  };
+}
 
 export default async function ListingPage({
   params,
@@ -14,7 +56,21 @@ export default async function ListingPage({
   const { id } = await params;
 
   const [listing, session] = await Promise.all([
-    prisma.listing.findUnique({ where: { id }, include: { user: true } }),
+    prisma.listing.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+            paypalHandle: true,
+            venmoHandle: true,
+          },
+        },
+      },
+    }),
     auth(),
   ]);
 
@@ -135,13 +191,24 @@ export default async function ListingPage({
               </Link>
             </div>
           ) : (
-            !listing.isSold && (
-              <MessageSeller
-                sellerId={listing.userId}
-                listingId={listing.id}
-                sellerName={listing.user.name ?? "Seller"}
-              />
-            )
+            <>
+              {!listing.isSold && (
+                <>
+                  <MessageSeller
+                    sellerId={listing.userId}
+                    listingId={listing.id}
+                    sellerName={listing.user.name ?? "Seller"}
+                  />
+
+                  <PaySeller
+                    paypalHandle={listing.user.paypalHandle ?? null}
+                    venmoHandle={listing.user.venmoHandle ?? null}
+                    price={listing.price.toString()}
+                    sellerName={listing.user.name ?? "Seller"}
+                  />
+                </>
+              )}
+            </>
           )}
 
           {/* Report button — only for logged-in non-owners */}

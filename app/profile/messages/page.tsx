@@ -10,7 +10,7 @@ import { formatDistanceToNow } from "date-fns";
 export default async function MessagesPage() {
   const session = await auth();
 
-  if (!session?.user?.id) redirect("/api/auth/signin");
+  if (!session?.user?.id) redirect("/login");
 
   const userId = session.user.id;
 

@@ -2,19 +2,23 @@ import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import Google from "next-auth/providers/google";
 import { prisma } from "@/lib/prisma";
+import { getAuthEnv, logAuthConfigIssues } from "@/lib/auth-config";
+
+const authEnv = getAuthEnv();
+logAuthConfigIssues();
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
 
   providers: [
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: authEnv.googleClientId ?? "",
+      clientSecret: authEnv.googleClientSecret ?? "",
       checks: ["state"],
     }),
   ],
 
-  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
+  secret: authEnv.secret,
 
   session: {
     strategy: "jwt",
@@ -37,6 +41,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
   pages: {
     signIn: "/login",
+    error: "/login",
   },
 
   trustHost: true,

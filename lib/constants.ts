@@ -27,6 +27,14 @@ export const CONDITION_COLORS: Record<string, string> = {
   Worn: "bg-zinc-800 text-zinc-400 border-zinc-700",
 };
 
+/** Semi-transparent variants for condition badges overlaid on listing card images. */
+export const CONDITION_OVERLAY_COLORS: Record<string, string> = {
+  New: "bg-blue-950/80 text-blue-300 border-blue-800",
+  "Like New": "bg-purple-950/80 text-purple-300 border-purple-800",
+  Good: "bg-amber-950/80 text-amber-400 border-amber-800",
+  Worn: "bg-zinc-800/80 text-zinc-400 border-zinc-700",
+};
+
 export const REPORT_STATUSES = ["pending", "reviewed", "dismissed"] as const;
 
 export const REPORT_STATUS_COLORS: Record<string, string> = {

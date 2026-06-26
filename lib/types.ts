@@ -13,7 +13,12 @@ export type ListingWithUser = Prisma.ListingGetPayload<{
   include: typeof listingWithUserInclude;
 }>;
 
-export type ListingGridItem = Omit<ListingWithUser, "price"> & { price: string };
+export type ListingGridItem = Omit<ListingWithUser, "price" | "createdAt" | "updatedAt"> & {
+  price: string;
+  createdAt: string;
+  updatedAt: string;
+  isSaved?: boolean;
+};
 
 export type ProfileListingItem = Pick<
   ListingWithUser,
@@ -100,4 +105,17 @@ export function serializeListingPrice<T extends { price: { toString(): string } 
   listing: T
 ): Omit<T, "price"> & { price: string } {
   return { ...listing, price: listing.price.toString() };
+}
+
+export function serializeListingForGrid(
+  listing: ListingWithUser,
+  savedIds: Set<string>
+): ListingGridItem {
+  return {
+    ...listing,
+    price: listing.price.toString(),
+    createdAt: listing.createdAt.toISOString(),
+    updatedAt: listing.updatedAt.toISOString(),
+    isSaved: savedIds.has(listing.id),
+  };
 }

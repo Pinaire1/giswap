@@ -1,10 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
+import { Heart } from "lucide-react";
 import MessageSeller from "@/components/messageseller";
 import { useDialog } from "@/lib/use-dialog";
 
@@ -13,19 +15,62 @@ type Listing = {
   title: string;
   brand: string;
   size: string;
+  color: string | null;
   condition: string;
   price: string;
   images: string[];
   userId: string;
+  createdAt: string;
+  isSaved?: boolean;
   user: { id: string; name: string | null; email: string | null };
 };
 
 const conditionColor: Record<string, string> = {
-  New:        "bg-blue-950 text-blue-300 border-blue-800",
-  "Like New":  "bg-purple-950 text-purple-300 border-purple-800",
-  Good:       "bg-amber-950 text-amber-400 border-amber-800",
-  Worn:       "bg-zinc-800 text-zinc-400 border-zinc-700",
+  New:        "bg-blue-950/80 text-blue-300 border-blue-800",
+  "Like New":  "bg-purple-950/80 text-purple-300 border-purple-800",
+  Good:       "bg-amber-950/80 text-amber-400 border-amber-800",
+  Worn:       "bg-zinc-800/80 text-zinc-400 border-zinc-700",
 };
+
+function timeAgo(iso: string) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const days = Math.floor(diff / 86_400_000);
+  if (days === 0) return "today";
+  if (days === 1) return "1d ago";
+  if (days < 30) return `${days}d ago`;
+  const months = Math.floor(days / 30);
+  return `${months}mo ago`;
+}
+
+function SaveButton({ listingId, initialSaved }: { listingId: string; initialSaved: boolean }) {
+  const [saved, setSaved] = useState(initialSaved);
+  const [pending, startTransition] = useTransition();
+
+  const toggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    startTransition(async () => {
+      const res = await fetch(`/api/listings/${listingId}/save`, { method: "POST" });
+      if (res.ok) setSaved((s) => !s);
+    });
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      disabled={pending}
+      aria-label={saved ? "Unsave listing" : "Save listing"}
+      aria-pressed={saved}
+      className={`absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full border backdrop-blur-sm transition-all active:scale-90 z-10 ${
+        saved
+          ? "bg-red-900/80 border-red-700 text-red-400"
+          : "bg-black/50 border-white/10 text-gray-400 hover:text-red-400 hover:border-red-800"
+      }`}
+    >
+      <Heart size={16} fill={saved ? "currentColor" : "none"} aria-hidden="true" />
+    </button>
+  );
+}
 
 function MessageModal({
   listing,
@@ -66,8 +111,7 @@ function MessageModal({
               Message Seller
             </h2>
             <p className="text-gray-400 text-sm mt-1">
-              {listing.brand} {listing.size} ·{" "}
-              {listing.user.name ?? "Seller"}
+              {listing.title} · {listing.user.name ?? "Seller"}
             </p>
           </div>
           <button
@@ -100,116 +144,118 @@ export default function ListingsGrid({
   totalPages?: number;
 }) {
   const { data: session } = useSession();
-  const [searchTerm, setSearchTerm] = useState("");
+  const searchParams = useSearchParams();
   const [messagingListing, setMessagingListing] = useState<Listing | null>(null);
 
-  const filtered = listings.filter(
-    (l) =>
-      l.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      l.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const pageHref = (p: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (p === 0) params.delete("page");
+    else params.set("page", String(p));
+    const qs = params.toString();
+    return `/listings${qs ? `?${qs}` : ""}`;
+  };
 
   return (
     <>
-      {/* Search */}
-      <div className="mb-10">
-        <label htmlFor="listing-search" className="sr-only">
-          Search listings by brand or model
-        </label>
-        <input
-          id="listing-search"
-          type="search"
-          placeholder="Search brands or models..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full md:w-96 p-4 bg-[#111] border border-[#1e2a4a] rounded-2xl text-white placeholder:text-gray-500 focus:border-blue-600 focus:outline-none transition"
-        />
-      </div>
-
-      {filtered.length === 0 ? (
+      {listings.length === 0 ? (
         <div className="text-center py-20">
-          <p className="text-2xl text-gray-400">
-            {listings.length === 0
-              ? "No gis on the mat yet — be the first to post!"
-              : "No gis match your search."}
-          </p>
+          <p className="text-2xl text-gray-400">No gis match your filters.</p>
+          <Link href="/listings" className="mt-4 inline-block text-blue-400 hover:text-blue-300 text-sm transition">
+            Clear filters
+          </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
-          {filtered.map((listing, index) => {
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
+          {listings.map((listing, index) => {
             const isOwnListing = session?.user?.id === listing.userId;
-            const condClass =
-              conditionColor[listing.condition] ?? conditionColor.Worn;
+            const condClass = conditionColor[listing.condition] ?? conditionColor.Worn;
+            const listingHref = `/listings/${listing.id}`;
 
             return (
               <article
                 key={listing.id}
-                className="card-in group bg-[#111] border border-[#1e2a4a] rounded-3xl overflow-hidden hover:border-blue-600 hover:shadow-lg hover:shadow-blue-900/30 hover:-translate-y-1.5 hover:scale-[1.02] transition-all duration-300"
+                className="card-in group bg-[#111] border border-[#1e2a4a] rounded-2xl overflow-hidden hover:border-blue-600 hover:shadow-lg hover:shadow-blue-900/30 hover:-translate-y-1 transition-all duration-300 flex flex-col"
                 style={{ animationDelay: `${Math.min(index * 0.03, 0.3)}s` }}
               >
-                <Link
-                  href={`/listings/${listing.id}`}
-                  className="block focus-visible:rounded-t-3xl"
-                >
-                  {/* Image */}
-                  <div className="h-56 sm:h-60 bg-[#161616] relative overflow-hidden">
-                    {listing.images?.length > 0 ? (
-                      <Image
-                        src={listing.images[0]}
-                        alt={listing.title}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
-                        className="object-cover group-hover:scale-110 transition-transform duration-700"
-                      />
-                    ) : (
-                      <div className="h-full flex items-center justify-center text-7xl opacity-20" aria-hidden="true">
-                        🥋
-                      </div>
-                    )}
-                    <div className="absolute top-0 left-0 right-0 h-0.5 belt-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </div>
+                <div className="relative flex-shrink-0">
+                  <Link href={listingHref} className="block focus-visible:rounded-t-2xl">
+                    <div className="h-52 bg-[#161616] relative overflow-hidden">
+                      {listing.images?.length > 0 ? (
+                        <Image
+                          src={listing.images[0]}
+                          alt={listing.title}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="h-full flex items-center justify-center text-6xl opacity-20" aria-hidden="true">
+                          🥋
+                        </div>
+                      )}
 
-                  {/* Info */}
-                  <div className="p-5 md:p-6">
-                    <div className="flex justify-between items-start gap-2 mb-1">
-                      <h3 className="text-base md:text-lg font-bold text-white leading-tight">
-                        {listing.brand} {listing.size}
-                      </h3>
-                      <p className="text-xl md:text-2xl font-black text-amber-400 shrink-0">
-                        ${listing.price}
-                      </p>
+                      <span className={`absolute top-3 left-3 px-2.5 py-1 text-xs font-semibold rounded-full border backdrop-blur-sm ${condClass}`}>
+                        {listing.condition}
+                      </span>
+
+                      {listing.images?.length > 1 && (
+                        <span className="absolute bottom-3 left-3 px-2 py-0.5 bg-black/60 text-white text-xs rounded-full backdrop-blur-sm">
+                          {listing.images.length} photos
+                        </span>
+                      )}
                     </div>
-
-                    <p className="text-gray-400 text-sm mb-4">
-                      by {listing.user.name ?? "Seller"}
-                    </p>
-
-                    <span
-                      className={`px-3 py-1 text-xs font-medium rounded-full border ${condClass}`}
-                    >
-                      {listing.condition}
-                    </span>
-                  </div>
-                </Link>
-
-                {/* Buttons */}
-                <div className="px-5 md:px-6 pb-5 md:pb-6 space-y-2">
-                  <Link
-                    href={`/listings/${listing.id}`}
-                    className="block w-full text-center py-3 bg-blue-700 hover:bg-blue-600 text-white rounded-2xl font-bold transition active:scale-95 text-sm"
-                  >
-                    View Gi
                   </Link>
 
                   {session && !isOwnListing && (
-                    <button
-                      type="button"
-                      onClick={() => setMessagingListing(listing)}
-                      className="w-full py-3 bg-transparent hover:bg-purple-950/40 border border-[#2a2a4a] hover:border-purple-600 text-gray-300 hover:text-purple-300 rounded-2xl font-medium text-sm transition active:scale-95"
-                    >
-                      Message Seller
-                    </button>
+                    <SaveButton listingId={listing.id} initialSaved={listing.isSaved ?? false} />
                   )}
+                </div>
+
+                <div className="p-4 flex flex-col flex-1">
+                  <div className="flex justify-between items-start gap-2 mb-1">
+                    <div className="min-w-0">
+                      <h3 className="text-sm font-bold text-white leading-snug truncate">
+                        <Link href={listingHref} className="hover:text-blue-300 transition">
+                          {listing.title}
+                        </Link>
+                      </h3>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {listing.brand} · {listing.size}
+                        {listing.color ? ` · ${listing.color}` : ""}
+                      </p>
+                    </div>
+                    <p className="text-lg font-black text-amber-400 shrink-0 tabular-nums">
+                      ${listing.price}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-[#1e2a4a] mt-3">
+                    <p className="text-gray-400 text-xs truncate">
+                      {listing.user.name ?? "Seller"}
+                    </p>
+                    <p className="text-gray-400 text-xs shrink-0 ml-2">
+                      {timeAgo(listing.createdAt)}
+                    </p>
+                  </div>
+
+                  <div className="mt-3 flex gap-2">
+                    <Link
+                      href={listingHref}
+                      className="flex-1 text-center py-2.5 bg-blue-700 hover:bg-blue-600 text-white rounded-xl font-semibold transition active:scale-95 text-xs min-h-[44px] flex items-center justify-center"
+                    >
+                      View Gi
+                    </Link>
+
+                    {session && !isOwnListing && (
+                      <button
+                        type="button"
+                        onClick={() => setMessagingListing(listing)}
+                        className="flex-1 py-2.5 bg-transparent hover:bg-purple-950/40 border border-[#2a2a4a] hover:border-purple-600 text-gray-400 hover:text-purple-300 rounded-xl font-medium text-xs transition active:scale-95 min-h-[44px]"
+                      >
+                        Message
+                      </button>
+                    )}
+                  </div>
                 </div>
               </article>
             );
@@ -217,7 +263,6 @@ export default function ListingsGrid({
         </div>
       )}
 
-      {/* Message modal */}
       <AnimatePresence>
         {messagingListing && (
           <MessageModal
@@ -227,12 +272,11 @@ export default function ListingsGrid({
         )}
       </AnimatePresence>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <nav aria-label="Listings pagination" className="flex justify-center items-center gap-3 mt-16">
           {page > 0 && (
             <Link
-              href={`/listings?page=${page - 1}`}
+              href={pageHref(page - 1)}
               className="px-5 py-2.5 bg-[#111] border border-[#1e2a4a] hover:border-blue-600 text-gray-400 hover:text-white rounded-xl text-sm font-medium transition"
             >
               ← Previous
@@ -243,7 +287,7 @@ export default function ListingsGrid({
           </span>
           {page < totalPages - 1 && (
             <Link
-              href={`/listings?page=${page + 1}`}
+              href={pageHref(page + 1)}
               className="px-5 py-2.5 bg-[#111] border border-[#1e2a4a] hover:border-blue-600 text-gray-400 hover:text-white rounded-xl text-sm font-medium transition"
             >
               Next →

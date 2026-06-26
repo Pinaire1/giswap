@@ -70,14 +70,35 @@ export default function PaySeller({
 
       <div className="space-y-2">
         {paypalHandle && (
-          <CopyButton value={paypalHandle} label="PayPal" />
+          <div className="space-y-1.5">
+            <CopyButton value={paypalHandle} label="PayPal" />
+            <a
+              href={`https://www.paypal.com/paypalme/${paypalHandle}/${price}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-[#003087]/20 border border-[#003087]/50 hover:bg-[#003087]/30 text-[#60a5fa] hover:text-white text-xs font-semibold transition"
+            >
+              Open PayPal →
+            </a>
+          </div>
         )}
         {venmoHandle && (
-          <CopyButton value={venmoHandle} label="Venmo" />
+          <div className="space-y-1.5">
+            <CopyButton value={venmoHandle} label="Venmo" />
+            <a
+              href={`https://venmo.com/${venmoHandle}?txn=pay&amount=${price}&note=GiSwap+purchase`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-[#008CFF]/10 border border-[#008CFF]/30 hover:bg-[#008CFF]/20 text-[#60a5fa] hover:text-white text-xs font-semibold transition"
+            >
+              Open Venmo →
+            </a>
+          </div>
         )}
       </div>
 
-      <p className="text-gray-400 text-xs mt-4">
+      <p className="text-gray-400 text-xs mt-4 flex items-start gap-1.5">
+        <span className="mt-px" aria-hidden="true">⚠</span>
         Always confirm the deal via messages before sending payment.
       </p>
     </div>

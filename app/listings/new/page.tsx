@@ -80,11 +80,11 @@ export default function NewListingPage() {
 
   const inputClass = "w-full p-4 bg-[#0d0d0d] border border-[#1e2a4a] rounded-2xl text-white placeholder:text-gray-500 focus:border-blue-600 focus:outline-none transition";
   const labelClass = "block text-sm font-medium mb-2 text-gray-400";
-  const chipBase = "border-2 border-[#1e2a4a] bg-[#0d0d0d] hover:bg-[#161626] rounded-2xl px-4 py-3 cursor-pointer text-center transition-all font-medium text-gray-400";
+  const chipBase = "border-2 border-[#1e2a4a] bg-[#0d0d0d] hover:bg-[#161626] rounded-2xl px-3 py-3 cursor-pointer text-center transition-all font-medium text-gray-400 min-h-[44px] flex items-center justify-center";
   const chipActive = "border-blue-600 text-blue-300 bg-[#0d0d20]";
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-12">
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
       <div className="belt-gradient h-0.5 w-16 rounded-full mb-6 opacity-70" />
 
       <motion.h1
@@ -98,7 +98,7 @@ export default function NewListingPage() {
 
       <motion.form
         onSubmit={handleSubmit}
-        className="space-y-8 bg-[#111] p-6 sm:p-10 rounded-3xl border border-[#1e2a4a]"
+        className="space-y-8 bg-[#111] p-5 sm:p-10 rounded-3xl border border-[#1e2a4a]"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         aria-busy={isSubmitting}
@@ -143,7 +143,7 @@ export default function NewListingPage() {
         {/* Size */}
         <fieldset>
           <legend className={`${labelClass} px-0`}>Size</legend>
-          <div className="grid grid-cols-7 gap-2">
+          <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
             {SIZES.map((s) => (
               <motion.button
                 key={s}

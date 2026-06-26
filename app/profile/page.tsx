@@ -23,9 +23,9 @@ export default async function ProfilePage() {
   if (!user) return <div className="p-10 text-gray-500">User not found.</div>;
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
       {/* Profile Header */}
-      <div className="bg-[#111] border border-[#1e2a4a] rounded-3xl p-8 mb-10">
+      <div className="bg-[#111] border border-[#1e2a4a] rounded-3xl p-5 sm:p-8 mb-10">
         <div className="belt-gradient h-0.5 w-16 rounded-full mb-6 opacity-60" />
         <div className="flex items-center gap-5">
           {user.image ? (

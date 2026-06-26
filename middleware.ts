@@ -1,8 +1,11 @@
 import { auth } from "@/auth";
 import { isAdmin } from "@/lib/admin";
+import { requireAuthSecret } from "@/lib/auth-secret";
 import { NextResponse } from "next/server";
 
 export default auth((req) => {
+  requireAuthSecret();
+
   const { pathname } = req.nextUrl;
 
   if (pathname.startsWith("/admin")) {

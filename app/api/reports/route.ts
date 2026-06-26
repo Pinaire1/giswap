@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
+import { isAdmin } from "@/lib/admin";
+import { rateLimitResponse } from "@/lib/rate-limit";
 
 const VALID_REASONS = [
   "Counterfeit / fake gi",
@@ -17,6 +19,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const limited = rateLimitResponse(`reports:${session.user.id}`, 10, 60_000);
+  if (limited) return limited;
+
   const { listingId, reason, details } = await req.json();
 
   if (!listingId || !reason) {
@@ -25,6 +30,14 @@ export async function POST(req: NextRequest) {
 
   if (!VALID_REASONS.includes(reason)) {
     return NextResponse.json({ error: "Invalid reason" }, { status: 400 });
+  }
+
+  const listing = await prisma.listing.findUnique({
+    where: { id: listingId },
+    select: { id: true },
+  });
+  if (!listing) {
+    return NextResponse.json({ error: "Listing not found" }, { status: 404 });
   }
 
   const existing = await prisma.report.findFirst({
@@ -43,7 +56,7 @@ export async function POST(req: NextRequest) {
       listingId,
       reporterId: session.user.id,
       reason,
-      details: details?.trim() || null,
+      details: details ? String(details).trim().slice(0, 2000) : null,
     },
   });
 
@@ -56,8 +69,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "").split(",").map((e) => e.trim());
-  if (!ADMIN_EMAILS.includes(session.user.email)) {
+  if (!isAdmin(session.user.email)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -78,8 +90,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "").split(",").map((e) => e.trim());
-  if (!ADMIN_EMAILS.includes(session.user.email)) {
+  if (!isAdmin(session.user.email)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

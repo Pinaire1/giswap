@@ -5,12 +5,10 @@ import { useRouter } from "next/navigation";
 
 interface MessageSellerProps {
   sellerName: string;
-  sellerId: string;
   listingId: string;
 }
 
 export default function MessageSeller({
-  sellerId,
   listingId,
   sellerName,
 }: MessageSellerProps) {
@@ -28,7 +26,7 @@ export default function MessageSeller({
       const res = await fetch("/api/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sellerId, listingId, content: message }),
+        body: JSON.stringify({ listingId, content: message }),
       });
 
       const data = await res.json();

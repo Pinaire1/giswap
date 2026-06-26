@@ -65,7 +65,6 @@ export default async function ListingPage({
           select: {
             id: true,
             name: true,
-            email: true,
             image: true,
             paypalHandle: true,
             venmoHandle: true,
@@ -205,7 +204,6 @@ export default async function ListingPage({
               {!listing.isSold && (
                 <>
                   <MessageSeller
-                    sellerId={listing.userId}
                     listingId={listing.id}
                     sellerName={listing.user.name ?? "Seller"}
                   />

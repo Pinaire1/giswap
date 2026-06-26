@@ -59,7 +59,7 @@ export default async function ListingsPage({
       take: PAGE_SIZE,
       skip: page * PAGE_SIZE,
       include: {
-        user: { select: { id: true, name: true, email: true } },
+        user: { select: { id: true, name: true, image: true } },
       },
     }),
     prisma.listing.count({ where }),

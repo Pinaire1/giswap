@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import Google from "next-auth/providers/google";
 import { prisma } from "@/lib/prisma";
+import { resolveAuthSecret } from "@/lib/auth-secret";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -13,7 +14,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
 
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: resolveAuthSecret(),
 
   session: {
     strategy: "jwt",

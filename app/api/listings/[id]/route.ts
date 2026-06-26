@@ -1,13 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
 import { auth } from "@/auth";
-
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "").split(",").map((e) => e.trim()).filter(Boolean);
-
-function isAdmin(email: string | null | undefined) {
-  return !!email && ADMIN_EMAILS.includes(email);
-}
+import { isAdmin } from "@/lib/admin";
+import { validateListingPatch } from "@/lib/listing-validation";
+import { rateLimitResponse } from "@/lib/rate-limit";
 
 async function canModifyListing(userId: string, userEmail: string | null | undefined, listingId: string) {
   if (isAdmin(userEmail)) return true;
@@ -28,25 +24,32 @@ export async function PATCH(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const limited = rateLimitResponse(`listings-patch:${session.user.id}`, 20, 60_000);
+  if (limited) return limited;
+
   const { id } = await params;
 
   if (!(await canModifyListing(session.user.id, session.user.email, id))) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  const existing = await prisma.listing.findUnique({ where: { id } });
+  if (!existing) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
   const body = await req.json();
+  const validated = validateListingPatch(body, existing);
 
-  const data: Prisma.ListingUpdateInput = {};
-  if ("title"       in body) data.title       = String(body.title);
-  if ("brand"       in body) data.brand       = String(body.brand);
-  if ("size"        in body) data.size        = String(body.size);
-  if ("condition"   in body) data.condition   = String(body.condition);
-  if ("price"       in body) data.price       = parseFloat(String(body.price));
-  if ("description" in body) data.description = String(body.description);
-  if ("images"      in body) data.images      = body.images as string[];
-  if ("isSold"      in body) data.isSold      = Boolean(body.isSold);
+  if ("error" in validated) {
+    return NextResponse.json({ error: validated.error }, { status: 400 });
+  }
 
-  const listing = await prisma.listing.update({ where: { id }, data });
+  if (Object.keys(validated.data).length === 0) {
+    return NextResponse.json({ error: "No valid fields to update" }, { status: 400 });
+  }
+
+  const listing = await prisma.listing.update({ where: { id }, data: validated.data });
   return NextResponse.json({ success: true, listing });
 }
 

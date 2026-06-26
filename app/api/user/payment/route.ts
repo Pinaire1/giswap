@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
+import { rateLimitResponse } from "@/lib/rate-limit";
 
 function sanitizeHandle(raw: unknown): string | null {
   if (typeof raw !== "string") return null;
-  // Strip leading @ and whitespace, max 64 chars
   const cleaned = raw.trim().replace(/^@+/, "").slice(0, 64);
   return cleaned.length > 0 ? cleaned : null;
 }
@@ -14,6 +14,9 @@ export async function PATCH(req: NextRequest) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const limited = rateLimitResponse(`payment:${session.user.id}`, 10, 60_000);
+  if (limited) return limited;
 
   const body = await req.json();
 

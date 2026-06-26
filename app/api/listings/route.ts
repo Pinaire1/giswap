@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
-
-const VALID_SIZES = ["A0", "A1", "A2", "A3", "A4", "A5", "A6"];
-const VALID_CONDITIONS = ["New", "Like New", "Good", "Worn"];
+import { validateListingCreate } from "@/lib/listing-validation";
+import { rateLimitResponse } from "@/lib/rate-limit";
 
 export async function GET() {
   try {
     const listings = await prisma.listing.findMany({
+      where: { isSold: false },
       orderBy: { createdAt: "desc" },
       include: {
-        user: { select: { id: true, name: true, email: true, image: true } },
+        user: { select: { id: true, name: true, image: true } },
       },
     });
     return NextResponse.json(listings);
@@ -27,33 +27,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const limited = rateLimitResponse(`listings:${session.user.id}`, 10, 60_000);
+    if (limited) return limited;
+
     const body = await request.json();
+    const validated = validateListingCreate(body);
 
-    const brand = String(body.brand ?? "").trim().slice(0, 100);
-    const size = String(body.size ?? "").trim();
-    const condition = String(body.condition ?? "").trim();
-    const price = parseFloat(body.price);
-    const description = String(body.description ?? "").trim().slice(0, 2000);
-    const images: string[] = Array.isArray(body.images)
-      ? body.images.slice(0, 5).filter((u: unknown) => typeof u === "string")
-      : [];
-
-    if (!brand) return NextResponse.json({ error: "Brand is required" }, { status: 400 });
-    if (!VALID_SIZES.includes(size)) return NextResponse.json({ error: "Invalid size" }, { status: 400 });
-    if (!VALID_CONDITIONS.includes(condition)) return NextResponse.json({ error: "Invalid condition" }, { status: 400 });
-    if (!isFinite(price) || price < 1 || price > 10000) {
-      return NextResponse.json({ error: "Price must be between $1 and $10,000" }, { status: 400 });
+    if ("error" in validated) {
+      return NextResponse.json({ error: validated.error }, { status: 400 });
     }
 
     const listing = await prisma.listing.create({
       data: {
-        title: `${brand} ${size}`,
-        brand,
-        size,
-        condition,
-        price,
-        description,
-        images,
+        ...validated.data,
         userId: session.user.id,
       },
     });

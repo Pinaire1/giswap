@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { pusherClient } from "@/lib/pusher-client";
+import { threadChannelName } from "@/lib/pusher-channels";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -41,17 +42,16 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
 
   const isBuyer = currentUserId === thread.buyerId;
   const other = isBuyer ? thread.seller : thread.buyer;
-  const sellerId = thread.sellerId;
 
   useEffect(() => {
-    const channel = pusherClient.subscribe(`thread-${thread.id}`);
+    const channel = pusherClient.subscribe(threadChannelName(thread.id));
     channel.bind("new-message", (newMessage: Message) => {
       setMessages((prev) => {
         if (prev.some((m) => m.id === newMessage.id)) return prev;
         return [...prev, newMessage];
       });
     });
-    return () => { pusherClient.unsubscribe(`thread-${thread.id}`); };
+    return () => { pusherClient.unsubscribe(threadChannelName(thread.id)); };
   }, [thread.id]);
 
   useEffect(() => {
@@ -79,7 +79,7 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
       const res = await fetch("/api/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ listingId: thread.listingId, sellerId, content: trimmed }),
+        body: JSON.stringify({ threadId: thread.id, content: trimmed }),
       });
 
       const data = await res.json();

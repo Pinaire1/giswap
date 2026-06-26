@@ -21,7 +21,7 @@ type Listing = {
   userId: string;
   createdAt: string;
   isSaved?: boolean;
-  user: { id: string; name: string | null; email: string | null };
+  user: { id: string; name: string | null; image?: string | null };
 };
 
 const conditionColor: Record<string, string> = {
@@ -239,7 +239,6 @@ export default function ListingsGrid({
                 </button>
               </div>
               <MessageSeller
-                sellerId={messagingListing.userId}
                 listingId={messagingListing.id}
                 sellerName={messagingListing.user.name ?? "Seller"}
               />

@@ -11,10 +11,10 @@ import PaymentSettings from "@/components/PaymentSettings";
 export default async function ProfilePage() {
   const session = await auth();
 
-  if (!session?.user?.email) redirect("/login");
+  if (!session?.user?.id) redirect("/login");
 
   const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
+    where: { id: session.user.id },
     include: {
       listings: { orderBy: { createdAt: "desc" } },
     },

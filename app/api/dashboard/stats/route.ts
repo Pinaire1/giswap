@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
+import type { DashboardStats } from "@/lib/types";
 
 export async function GET() {
   const session = await auth();
@@ -23,9 +24,11 @@ export async function GET() {
     0
   );
 
-  return NextResponse.json({
+  const stats: DashboardStats = {
     activeListings: activeCount,
     soldCount: soldListings.length,
     totalEarnings,
-  });
+  };
+
+  return NextResponse.json(stats);
 }

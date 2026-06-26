@@ -4,6 +4,7 @@ import ListingsGrid from "@/components/ListingsGrid";
 import FilterBar from "@/components/FilterBar";
 import { Suspense } from "react";
 import type { Prisma } from "@prisma/client";
+import { listingWithUserInclude, serializeListingForGrid } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -58,9 +59,7 @@ export default async function ListingsPage({
       orderBy: { createdAt: "desc" },
       take: PAGE_SIZE,
       skip: page * PAGE_SIZE,
-      include: {
-        user: { select: { id: true, name: true, email: true } },
-      },
+      include: listingWithUserInclude,
     }),
     prisma.listing.count({ where }),
     session?.user?.id
@@ -72,14 +71,7 @@ export default async function ListingsPage({
   ]);
 
   const savedIds = new Set(saved.map((s) => s.listingId));
-
-  const serialized = listings.map((l) => ({
-    ...l,
-    price: l.price.toString(),
-    createdAt: l.createdAt.toISOString(),
-    updatedAt: l.updatedAt.toISOString(),
-    isSaved: savedIds.has(l.id),
-  }));
+  const serialized = listings.map((listing) => serializeListingForGrid(listing, savedIds));
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 

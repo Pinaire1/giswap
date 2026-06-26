@@ -3,9 +3,10 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
+import { formatDistanceToNow } from "date-fns";
+import { threadListInclude } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
-import { formatDistanceToNow } from "date-fns";
 
 export default async function MessagesPage() {
   const session = await auth();
@@ -16,16 +17,9 @@ export default async function MessagesPage() {
 
   const threads = await prisma.messageThread.findMany({
     where: { OR: [{ buyerId: userId }, { sellerId: userId }] },
-    include: {
-      listing: { select: { id: true, title: true, images: true } },
-      buyer:   { select: { id: true, name: true, image: true } },
-      seller:  { select: { id: true, name: true, image: true } },
-      messages: { orderBy: { createdAt: "desc" as const }, take: 1 },
-    },
-    orderBy: { createdAt: "desc" as const },
+    include: threadListInclude,
+    orderBy: { createdAt: "desc" },
   });
-
-  type Thread = (typeof threads)[number];
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
@@ -43,7 +37,7 @@ export default async function MessagesPage() {
         </div>
       ) : (
         <ul className="space-y-2">
-          {threads.map((thread: Thread) => {
+          {threads.map((thread) => {
             const isBuyer = thread.buyerId === userId;
             const other = isBuyer ? thread.seller : thread.buyer;
             const lastMsg = thread.messages[0];

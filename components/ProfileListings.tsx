@@ -4,19 +4,9 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import type { ProfileListingItem } from "@/lib/types";
 
-type Listing = {
-  id: string;
-  title: string;
-  brand: string;
-  size: string;
-  condition: string;
-  price: string;
-  isSold: boolean;
-  images: string[];
-};
-
-export default function ProfileListings({ listings }: { listings: Listing[] }) {
+export default function ProfileListings({ listings }: { listings: ProfileListingItem[] }) {
   const router = useRouter();
   const [items, setItems] = useState(listings);
   const [loadingId, setLoadingId] = useState<string | null>(null);

@@ -5,17 +5,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-
-type Stats = {
-  activeListings: number;
-  soldCount: number;
-  totalEarnings: number;
-};
+import type { DashboardStats } from "@/lib/types";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [stats, setStats] = useState<Stats | null>(null);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/login");

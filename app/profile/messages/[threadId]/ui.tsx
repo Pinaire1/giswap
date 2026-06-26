@@ -4,37 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import { pusherClient } from "@/lib/pusher-client";
 import Image from "next/image";
 import Link from "next/link";
+import type { ChatMessage, ChatThread, DisplayChatMessage, PendingChatMessage, SendMessageResponse } from "@/lib/types";
 
-type Message = {
-  id: string;
-  content: string;
-  fromId: string;
-  createdAt: string | Date;
-  from?: {
-    id: string;
-    name?: string | null;
-    image?: string | null;
-  };
-};
-
-type Thread = {
-  id: string;
-  listingId: string;
-  buyerId: string;
-  sellerId: string;
-  listing: { id: string; title: string; images: string[] };
-  buyer:   { id: string; name?: string | null; image?: string | null };
-  seller:  { id: string; name?: string | null; image?: string | null };
-  messages: Message[];
-};
-
-interface ChatClientProps {
-  thread: Thread;
+type ChatClientProps = {
+  thread: ChatThread;
   currentUserId: string;
-}
+};
 
 export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
-  const [messages, setMessages] = useState<Message[]>(thread.messages);
+  const [messages, setMessages] = useState<DisplayChatMessage[]>(thread.messages);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -45,7 +23,7 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
 
   useEffect(() => {
     const channel = pusherClient.subscribe(`thread-${thread.id}`);
-    channel.bind("new-message", (newMessage: Message) => {
+    channel.bind("new-message", (newMessage: ChatMessage) => {
       setMessages((prev) => {
         if (prev.some((m) => m.id === newMessage.id)) return prev;
         return [...prev, newMessage];
@@ -64,7 +42,7 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
     setLoading(true);
 
     const tempId = `temp-${Date.now()}`;
-    const tempMessage: Message = {
+    const tempMessage: PendingChatMessage = {
       id: tempId,
       content: trimmed,
       fromId: currentUserId,
@@ -82,11 +60,12 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
         body: JSON.stringify({ listingId: thread.listingId, sellerId, content: trimmed }),
       });
 
-      const data = await res.json();
+      const data: SendMessageResponse = await res.json();
 
-      if (data?.message) {
+      if (data.message) {
+        const saved = data.message;
         setMessages((prev) =>
-          prev.map((m) => (m.id === tempId ? (data.message as Message) : m))
+          prev.map((m) => (m.id === tempId ? saved : m))
         );
       }
     } catch (error) {

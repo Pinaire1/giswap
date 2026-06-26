@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { pusherServer } from "@/lib/pusher";
+import { threadListInclude } from "@/lib/types";
 
 // GET /api/messages — fetch all threads for the current user
 export async function GET() {
@@ -17,15 +18,7 @@ export async function GET() {
     where: {
       OR: [{ buyerId: userId }, { sellerId: userId }],
     },
-    include: {
-      listing: { select: { id: true, title: true, images: true } },
-      buyer: { select: { id: true, name: true, image: true } },
-      seller: { select: { id: true, name: true, image: true } },
-      messages: {
-        orderBy: { createdAt: "desc" },
-        take: 1,
-      },
-    },
+    include: threadListInclude,
     orderBy: { createdAt: "desc" },
   });
 

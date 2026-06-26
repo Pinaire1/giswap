@@ -8,28 +8,8 @@ import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Heart } from "lucide-react";
 import MessageSeller from "@/components/messageseller";
-
-type Listing = {
-  id: string;
-  title: string;
-  brand: string;
-  size: string;
-  color: string | null;
-  condition: string;
-  price: string;
-  images: string[];
-  userId: string;
-  createdAt: string;
-  isSaved?: boolean;
-  user: { id: string; name: string | null; email: string | null };
-};
-
-const conditionColor: Record<string, string> = {
-  New:        "bg-blue-950/80 text-blue-300 border-blue-800",
-  "Like New":  "bg-purple-950/80 text-purple-300 border-purple-800",
-  Good:       "bg-amber-950/80 text-amber-400 border-amber-800",
-  Worn:       "bg-zinc-800/80 text-zinc-400 border-zinc-700",
-};
+import { CONDITION_OVERLAY_COLORS } from "@/lib/constants";
+import type { ListingGridItem } from "@/lib/types";
 
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
@@ -74,14 +54,14 @@ export default function ListingsGrid({
   page = 0,
   totalPages = 1,
 }: {
-  listings: Listing[];
+  listings: ListingGridItem[];
   page?: number;
   totalPages?: number;
 }) {
   const { data: session } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [messagingListing, setMessagingListing] = useState<Listing | null>(null);
+  const [messagingListing, setMessagingListing] = useState<ListingGridItem | null>(null);
 
   const pageHref = (p: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -104,7 +84,8 @@ export default function ListingsGrid({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
           {listings.map((listing, index) => {
             const isOwnListing = session?.user?.id === listing.userId;
-            const condClass = conditionColor[listing.condition] ?? conditionColor.Worn;
+            const condClass =
+              CONDITION_OVERLAY_COLORS[listing.condition] ?? CONDITION_OVERLAY_COLORS.Worn;
 
             return (
               <div

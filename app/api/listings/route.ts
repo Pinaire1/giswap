@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
-
-const VALID_SIZES = ["A0", "A1", "A2", "A3", "A4", "A5", "A6"];
-const VALID_CONDITIONS = ["New", "Like New", "Good", "Worn"];
+import { VALID_SIZES, VALID_CONDITIONS } from "@/lib/constants";
+import { parseStringArray } from "@/lib/types";
 
 export async function GET() {
   try {
@@ -34,9 +33,7 @@ export async function POST(request: NextRequest) {
     const condition = String(body.condition ?? "").trim();
     const price = parseFloat(body.price);
     const description = String(body.description ?? "").trim().slice(0, 2000);
-    const images: string[] = Array.isArray(body.images)
-      ? body.images.slice(0, 5).filter((u: unknown) => typeof u === "string")
-      : [];
+    const images = parseStringArray(body.images, 5);
 
     if (!brand) return NextResponse.json({ error: "Brand is required" }, { status: 400 });
     if (!VALID_SIZES.includes(size)) return NextResponse.json({ error: "Invalid size" }, { status: 400 });

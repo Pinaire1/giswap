@@ -73,14 +73,14 @@ export default function EditListingForm({ listing }: { listing: ListingData }) {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-12">
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
       <div className="belt-gradient h-0.5 w-16 rounded-full mb-6 opacity-70" />
       <h1 className="text-4xl font-black text-white mb-2">Edit Listing</h1>
       <p className="text-blue-400 mb-10 text-sm">Changes save immediately to the marketplace.</p>
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-8 bg-[#111] p-10 rounded-3xl border border-[#1e2a4a]"
+        className="space-y-8 bg-[#111] p-5 sm:p-10 rounded-3xl border border-[#1e2a4a]"
       >
         <div>
           <label className={labelClass}>Brand</label>

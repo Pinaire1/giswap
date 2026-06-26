@@ -119,10 +119,10 @@ export default function ProfileListings({ listings }: { listings: Listing[] }) {
                 {listing.isSold ? "Sold" : "Active"}
               </span>
 
-              <div className="flex gap-2 mt-4">
+              <div className="flex flex-wrap gap-2 mt-4">
                 <Link
                   href={`/listings/${listing.id}/edit`}
-                  className="flex-1 py-2 text-xs font-medium text-center bg-[#0d0d0d] border border-[#1e2a4a] hover:border-blue-600 text-gray-400 hover:text-blue-300 rounded-xl transition"
+                  className="flex-1 py-2.5 text-xs font-medium text-center bg-[#0d0d0d] border border-[#1e2a4a] hover:border-blue-600 text-gray-400 hover:text-blue-300 rounded-xl transition min-h-[44px] flex items-center justify-center"
                 >
                   Edit
                 </Link>
@@ -131,7 +131,7 @@ export default function ProfileListings({ listings }: { listings: Listing[] }) {
                   <button
                     onClick={() => markSold(listing.id)}
                     disabled={busy}
-                    className="flex-1 py-2 text-xs font-medium bg-amber-950/50 border border-amber-900/50 hover:bg-amber-900/30 text-amber-400 rounded-xl transition disabled:opacity-50"
+                    className="flex-1 py-2.5 text-xs font-medium bg-amber-950/50 border border-amber-900/50 hover:bg-amber-900/30 text-amber-400 rounded-xl transition disabled:opacity-50 min-h-[44px]"
                   >
                     {busy ? "…" : "Mark Sold"}
                   </button>
@@ -140,7 +140,7 @@ export default function ProfileListings({ listings }: { listings: Listing[] }) {
                 <button
                   onClick={() => deleteListing(listing.id)}
                   disabled={busy}
-                  className="flex-1 py-2 text-xs font-medium bg-red-950/40 border border-red-900/40 hover:bg-red-900/30 text-red-400 rounded-xl transition disabled:opacity-50"
+                  className="flex-1 py-2.5 text-xs font-medium bg-red-950/40 border border-red-900/40 hover:bg-red-900/30 text-red-400 rounded-xl transition disabled:opacity-50 min-h-[44px]"
                 >
                   {busy ? "…" : "Delete"}
                 </button>

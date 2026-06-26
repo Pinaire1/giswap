@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import MessageSeller from "@/components/messageseller";
 import ReportButton from "@/components/ReportButton";
 import PaySeller from "@/components/PaySeller";
+import ImageGallery from "@/components/ImageGallery";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -69,6 +69,7 @@ export default async function ListingPage({
             image: true,
             paypalHandle: true,
             venmoHandle: true,
+            _count: { select: { listings: { where: { isSold: false } } } },
           },
         },
       },
@@ -98,42 +99,8 @@ export default async function ListingPage({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mt-4 sm:mt-6">
         {/* Images */}
-        <div className="space-y-3">
-          <div className="aspect-square bg-[#111] rounded-2xl sm:rounded-3xl overflow-hidden border border-[#1e2a4a] relative">
-            {listing.images?.length > 0 ? (
-              <Image
-                src={listing.images[0]}
-                alt={listing.title}
-                fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover"
-                priority
-              />
-            ) : (
-              <div className="h-full flex items-center justify-center text-8xl opacity-20">
-                🥋
-              </div>
-            )}
-          </div>
-
-          {listing.images?.length > 1 && (
-            <div className="grid grid-cols-4 gap-2">
-              {listing.images.slice(1).map((img, i) => (
-                <div
-                  key={i}
-                  className="aspect-square rounded-xl overflow-hidden border border-[#1e2a4a] relative"
-                >
-                  <Image
-                    src={img}
-                    alt={`${listing.title} photo ${i + 2}`}
-                    fill
-                    sizes="(max-width: 1024px) 25vw, 12vw"
-                    className="object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-          )}
+        <div>
+          <ImageGallery images={listing.images ?? []} title={listing.title} />
         </div>
 
         {/* Details */}
@@ -169,6 +136,18 @@ export default async function ListingPage({
               <p className="text-gray-500 mb-1">Size</p>
               <p className="text-white font-semibold">{listing.size}</p>
             </div>
+            {listing.color && (
+              <div className="bg-[#111] border border-[#1e2a4a] rounded-xl sm:rounded-2xl p-3 sm:p-4">
+                <p className="text-gray-500 mb-1">Color</p>
+                <p className="text-white font-semibold">{listing.color}</p>
+              </div>
+            )}
+            {listing.weight && (
+              <div className="bg-[#111] border border-[#1e2a4a] rounded-xl sm:rounded-2xl p-3 sm:p-4">
+                <p className="text-gray-500 mb-1">Weight</p>
+                <p className="text-white font-semibold">{listing.weight}</p>
+              </div>
+            )}
           </div>
 
           {listing.description && (
@@ -180,9 +159,36 @@ export default async function ListingPage({
             </div>
           )}
 
-          <div className="mb-6 text-sm text-gray-500">
-            Listed by{" "}
-            <span className="text-blue-400">{listing.user.name ?? "Seller"}</span>
+          {/* Seller card */}
+          <div className="bg-[#111] border border-[#1e2a4a] rounded-xl sm:rounded-2xl p-4 mb-5 sm:mb-6 flex items-center gap-3">
+            {listing.user.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={listing.user.image}
+                alt={listing.user.name ?? "Seller"}
+                width={40}
+                height={40}
+                className="w-10 h-10 rounded-full ring-2 ring-blue-900 flex-shrink-0"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-blue-950 border border-blue-800 flex items-center justify-center flex-shrink-0 text-blue-400 font-bold text-sm">
+                {(listing.user.name ?? "S")[0].toUpperCase()}
+              </div>
+            )}
+            <div className="min-w-0">
+              <p className="text-white font-semibold text-sm truncate">
+                {listing.user.name ?? "Seller"}
+              </p>
+              <p className="text-gray-600 text-xs">
+                {listing.user._count.listings} listing{listing.user._count.listings !== 1 ? "s" : ""} available
+              </p>
+            </div>
+            <Link
+              href={`/listings?brand=${encodeURIComponent(listing.brand)}`}
+              className="ml-auto text-xs text-blue-400 hover:text-blue-300 transition shrink-0"
+            >
+              See more →
+            </Link>
           </div>
 
           {isOwnListing ? (

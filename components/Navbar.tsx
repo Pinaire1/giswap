@@ -5,17 +5,43 @@ import { useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { Shirt, LogOut, User } from "lucide-react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
+
+const NAV_LINKS = [
+  { href: "/listings", label: "Browse Gis" },
+  { href: "/listings/new", label: "Sell Your Gi" },
+  { href: "/dashboard", label: "Dashboard" },
+  { href: "/profile/messages", label: "Messages" },
+];
 
 export default function Navbar() {
   const { data: session, status } = useSession();
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isActive = (href: string) =>
+    href === "/listings"
+      ? pathname === "/listings" || (pathname.startsWith("/listings/") && !pathname.startsWith("/listings/new"))
+      : pathname.startsWith(href);
+
+  const linkClass = (href: string) =>
+    `whitespace-nowrap text-sm lg:text-base transition-colors ${
+      isActive(href)
+        ? "text-white font-semibold"
+        : "text-gray-400 hover:text-white"
+    }`;
+
+  const mobileLinkClass = (href: string) =>
+    `py-3 transition-colors ${
+      isActive(href) ? "text-blue-400 font-semibold" : "text-gray-300 hover:text-blue-400"
+    }`;
 
   return (
     <nav className="bg-[#0d0d0d] border-b border-[#1e2a4a] sticky top-0 z-50">
       {/* Belt stripe accent at top */}
       <div className="belt-gradient h-0.5 w-full opacity-70" />
 
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 font-bold text-2xl text-white">
@@ -24,15 +50,19 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8 text-gray-300">
-            <Link href="/listings" className="nav-link hover:text-white transition-colors">Browse Gis</Link>
-            <Link href="/listings/new" className="nav-link hover:text-white transition-colors">Sell Your Gi</Link>
-            <Link href="/dashboard" className="nav-link hover:text-white transition-colors">Dashboard</Link>
-            <Link href="/profile/messages" className="nav-link hover:text-white transition-colors">Messages</Link>
+          <div className="hidden md:flex items-center gap-4 lg:gap-8">
+            {NAV_LINKS.map(({ href, label }) => (
+              <Link key={href} href={href} className={linkClass(href)}>
+                {label}
+                {isActive(href) && (
+                  <span className="block h-0.5 bg-blue-500 rounded-full mt-0.5" />
+                )}
+              </Link>
+            ))}
           </div>
 
           {/* Desktop Auth + Profile */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-2 lg:gap-4">
             {status === "loading" ? (
               <div className="text-gray-500 text-sm">Loading...</div>
             ) : session ? (
@@ -86,7 +116,7 @@ export default function Navbar() {
             aria-label={isOpen ? "Close menu" : "Open menu"}
             aria-expanded={isOpen}
             aria-controls="mobile-menu"
-            className="md:hidden text-white text-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
+            className="md:hidden text-white text-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded w-11 h-11 flex items-center justify-center"
           >
             {isOpen ? "✕" : "☰"}
           </button>
@@ -94,21 +124,27 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div id="mobile-menu" className="md:hidden py-6 border-t border-[#1e2a4a]">
-            <div className="flex flex-col gap-5 text-base text-gray-300">
-              <Link href="/listings" onClick={() => setIsOpen(false)} className="hover:text-blue-400 transition">Browse Gis</Link>
-              <Link href="/listings/new" onClick={() => setIsOpen(false)} className="hover:text-blue-400 transition">Sell Your Gi</Link>
-              <Link href="/dashboard" onClick={() => setIsOpen(false)} className="hover:text-blue-400 transition">Dashboard</Link>
-              <Link href="/profile/messages" onClick={() => setIsOpen(false)} className="hover:text-blue-400 transition">Messages</Link>
+          <div id="mobile-menu" className="md:hidden py-4 border-t border-[#1e2a4a]">
+            <div className="flex flex-col text-base">
+              {NAV_LINKS.map(({ href, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={() => setIsOpen(false)}
+                  className={mobileLinkClass(href)}
+                >
+                  {label}
+                </Link>
+              ))}
 
               {session ? (
                 <>
-                  <Link href="/profile" onClick={() => setIsOpen(false)} className="flex items-center gap-3 hover:text-blue-400 transition">
+                  <Link href="/profile" onClick={() => setIsOpen(false)} className="py-3 flex items-center gap-3 text-gray-300 hover:text-blue-400 transition">
                     <User size={20} /> Profile
                   </Link>
                   <button
                     onClick={() => { signOut({ callbackUrl: "/" }); setIsOpen(false); }}
-                    className="flex items-center gap-3 text-red-400 text-left"
+                    className="py-3 flex items-center gap-3 text-red-400 text-left"
                   >
                     <LogOut size={20} /> Logout
                   </button>

@@ -6,13 +6,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { UploadButton } from "@/lib/uploadthing";
 import Image from "next/image";
-
-const COMMON_BRANDS = [
-  "Shoyoroll", "Tatami", "Kingz", "Scramble", "Hyperfly",
-  "Fuji", "Venum", "Sanabul", "Flow", "Gameness",
-];
-
-const SIZES = ["A0", "A1", "A2", "A3", "A4", "A5", "A6"];
+import { COMMON_BRANDS, GI_CONDITIONS, GI_SIZES } from "@/lib/constants";
 
 export default function NewListingPage() {
   const { data: session, status } = useSession();
@@ -131,7 +125,7 @@ export default function NewListingPage() {
         <div>
           <label className={labelClass}>Size</label>
           <div className="grid grid-cols-7 gap-2">
-            {SIZES.map((s) => (
+            {GI_SIZES.map((s) => (
               <motion.button
                 key={s}
                 type="button"
@@ -150,12 +144,7 @@ export default function NewListingPage() {
         <div>
           <label className={labelClass}>Condition</label>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[
-              { label: "New",       accent: "border-blue-600 text-blue-300" },
-              { label: "Like New",  accent: "border-purple-600 text-purple-300" },
-              { label: "Good",      accent: "border-amber-700 text-amber-400" },
-              { label: "Worn",      accent: "border-zinc-500 text-zinc-400" },
-            ].map(({ label, accent }) => (
+            {GI_CONDITIONS.map(({ label, accent }) => (
               <motion.label
                 key={label}
                 whileHover={{ scale: 1.05 }}
@@ -189,7 +178,7 @@ export default function NewListingPage() {
             <UploadButton
               endpoint="giImageUploader"
               onClientUploadComplete={(res) => {
-                const urls = res.map((r: any) => r.url); // eslint-disable-line @typescript-eslint/no-explicit-any
+                const urls = res.map((r) => r.url);
                 setUploadedImages((prev) => [...prev, ...urls]);
               }}
               onUploadError={(error: Error) => alert(`Upload failed: ${error.message}`)}

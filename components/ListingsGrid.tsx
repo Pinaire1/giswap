@@ -7,39 +7,22 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import MessageSeller from "@/components/messageseller";
-
-type Listing = {
-  id: string;
-  title: string;
-  brand: string;
-  size: string;
-  condition: string;
-  price: string;
-  images: string[];
-  userId: string;
-  user: { id: string; name: string | null; email: string | null };
-};
-
-const conditionColor: Record<string, string> = {
-  New:        "bg-blue-950 text-blue-300 border-blue-800",
-  "Like New":  "bg-purple-950 text-purple-300 border-purple-800",
-  Good:       "bg-amber-950 text-amber-400 border-amber-800",
-  Worn:       "bg-zinc-800 text-zinc-400 border-zinc-700",
-};
+import { CONDITION_COLORS } from "@/lib/constants";
+import type { ListingGridItem } from "@/lib/types";
 
 export default function ListingsGrid({
   listings,
   page = 0,
   totalPages = 1,
 }: {
-  listings: Listing[];
+  listings: ListingGridItem[];
   page?: number;
   totalPages?: number;
 }) {
   const { data: session } = useSession();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
-  const [messagingListing, setMessagingListing] = useState<Listing | null>(null);
+  const [messagingListing, setMessagingListing] = useState<ListingGridItem | null>(null);
 
   const filtered = listings.filter(
     (l) =>
@@ -73,7 +56,7 @@ export default function ListingsGrid({
           {filtered.map((listing, index) => {
             const isOwnListing = session?.user?.id === listing.userId;
             const condClass =
-              conditionColor[listing.condition] ?? conditionColor.Worn;
+              CONDITION_COLORS[listing.condition] ?? CONDITION_COLORS.Worn;
 
             return (
               <div

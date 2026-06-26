@@ -4,26 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { UploadButton } from "@/lib/uploadthing";
+import { GI_CONDITIONS, GI_SIZES } from "@/lib/constants";
+import type { EditListingData } from "@/lib/types";
 
-type ListingData = {
-  id: string;
-  brand: string;
-  size: string;
-  condition: string;
-  price: string;
-  description: string;
-  images: string[];
-};
-
-const SIZES = ["A0", "A1", "A2", "A3", "A4", "A5", "A6"];
-const CONDITIONS = [
-  { label: "New", accent: "border-blue-600 text-blue-300" },
-  { label: "Like New", accent: "border-purple-600 text-purple-300" },
-  { label: "Good", accent: "border-amber-700 text-amber-400" },
-  { label: "Worn", accent: "border-zinc-500 text-zinc-400" },
-];
-
-export default function EditListingForm({ listing }: { listing: ListingData }) {
+export default function EditListingForm({ listing }: { listing: EditListingData }) {
   const router = useRouter();
   const [brand, setBrand] = useState(listing.brand);
   const [size, setSize] = useState(listing.size);
@@ -101,7 +85,7 @@ export default function EditListingForm({ listing }: { listing: ListingData }) {
             className={inputClass}
             required
           >
-            {SIZES.map((s) => (
+            {GI_SIZES.map((s) => (
               <option key={s} value={s}>
                 {s}
               </option>
@@ -112,7 +96,7 @@ export default function EditListingForm({ listing }: { listing: ListingData }) {
         <div>
           <label className={labelClass}>Condition</label>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {CONDITIONS.map(({ label, accent }) => (
+            {GI_CONDITIONS.map(({ label, accent }) => (
               <label
                 key={label}
                 className={`border-2 rounded-2xl p-4 cursor-pointer text-center transition-all font-medium ${

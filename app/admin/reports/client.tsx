@@ -2,31 +2,17 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { REPORT_STATUSES, REPORT_STATUS_COLORS } from "@/lib/constants";
+import type { ReportStatus, ReportWithRelations } from "@/lib/types";
 
-type Report = {
-  id: string;
-  reason: string;
-  details: string | null;
-  status: string;
-  createdAt: Date | string;
-  reporter: { id: string; name: string | null; email: string | null };
-  listing: { id: string; title: string; brand: string; userId: string };
-};
-
-const statusColor: Record<string, string> = {
-  pending: "bg-amber-950 text-amber-400 border-amber-800",
-  reviewed: "bg-blue-950 text-blue-400 border-blue-800",
-  dismissed: "bg-zinc-800 text-zinc-400 border-zinc-700",
-};
-
-export default function AdminReportsClient({ reports: initial }: { reports: Report[] }) {
+export default function AdminReportsClient({ reports: initial }: { reports: ReportWithRelations[] }) {
   const [reports, setReports] = useState(initial);
-  const [filter, setFilter] = useState<"all" | "pending" | "reviewed" | "dismissed">("pending");
+  const [filter, setFilter] = useState<"all" | ReportStatus>("pending");
   const [loading, setLoading] = useState<string | null>(null);
 
   const filtered = filter === "all" ? reports : reports.filter((r) => r.status === filter);
 
-  const updateStatus = async (reportId: string, status: string) => {
+  const updateStatus = async (reportId: string, status: ReportStatus) => {
     setLoading(reportId);
     try {
       const res = await fetch("/api/reports", {
@@ -69,7 +55,7 @@ export default function AdminReportsClient({ reports: initial }: { reports: Repo
 
       {/* Filter tabs */}
       <div className="flex gap-2 mb-8">
-        {(["all", "pending", "reviewed", "dismissed"] as const).map((tab) => (
+        {(["all", ...REPORT_STATUSES] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setFilter(tab)}
@@ -104,7 +90,7 @@ export default function AdminReportsClient({ reports: initial }: { reports: Repo
                     </Link>
                     <span
                       className={`px-2 py-0.5 text-xs font-medium rounded-full border ${
-                        statusColor[report.status] ?? statusColor.pending
+                        REPORT_STATUS_COLORS[report.status] ?? REPORT_STATUS_COLORS.pending
                       }`}
                     >
                       {report.status}

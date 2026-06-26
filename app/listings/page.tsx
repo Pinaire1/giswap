@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import ListingsGrid from "@/components/ListingsGrid";
+import { listingWithUserInclude, serializeListingPrice } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -18,17 +19,12 @@ export default async function ListingsPage({
       orderBy: { createdAt: "desc" },
       take: PAGE_SIZE,
       skip: page * PAGE_SIZE,
-      include: {
-        user: { select: { id: true, name: true, email: true } },
-      },
+      include: listingWithUserInclude,
     }),
     prisma.listing.count({ where: { isSold: false } }),
   ]);
 
-  const serialized = listings.map((l) => ({
-    ...l,
-    price: l.price.toString(),
-  }));
+  const serialized = listings.map(serializeListingPrice);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 

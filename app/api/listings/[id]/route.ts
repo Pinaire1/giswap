@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { auth } from "@/auth";
+import { parseStringArray } from "@/lib/types";
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "").split(",").map((e) => e.trim()).filter(Boolean);
 
@@ -43,7 +44,7 @@ export async function PATCH(
   if ("condition"   in body) data.condition   = String(body.condition);
   if ("price"       in body) data.price       = parseFloat(String(body.price));
   if ("description" in body) data.description = String(body.description);
-  if ("images"      in body) data.images      = body.images as string[];
+  if ("images"      in body) data.images      = parseStringArray(body.images, 5);
   if ("isSold"      in body) data.isSold      = Boolean(body.isSold);
 
   const listing = await prisma.listing.update({ where: { id }, data });

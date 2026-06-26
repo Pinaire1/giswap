@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import AdminReportsClient from "./client";
+import { reportWithRelationsInclude } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -16,10 +17,7 @@ export default async function AdminReportsPage() {
 
   const reports = await prisma.report.findMany({
     orderBy: { createdAt: "desc" },
-    include: {
-      reporter: { select: { id: true, name: true, email: true } },
-      listing: { select: { id: true, title: true, brand: true, userId: true } },
-    },
+    include: reportWithRelationsInclude,
   });
 
   return <AdminReportsClient reports={reports} />;

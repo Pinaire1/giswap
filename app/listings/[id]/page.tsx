@@ -7,6 +7,7 @@ import MessageSeller from "@/components/messageseller";
 import ReportButton from "@/components/ReportButton";
 import PaySeller from "@/components/PaySeller";
 import type { Metadata } from "next";
+import { CONDITION_COLORS } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -78,13 +79,7 @@ export default async function ListingPage({
 
   if (!listing) notFound();
 
-  const conditionColor: Record<string, string> = {
-    New:        "bg-blue-950 text-blue-300 border-blue-800",
-    "Like New":  "bg-purple-950 text-purple-300 border-purple-800",
-    Good:       "bg-amber-950 text-amber-400 border-amber-800",
-    Worn:       "bg-zinc-800 text-zinc-400 border-zinc-700",
-  };
-  const condClass = conditionColor[listing.condition] ?? conditionColor.Worn;
+  const condClass = CONDITION_COLORS[listing.condition] ?? CONDITION_COLORS.Worn;
   const isOwnListing = session?.user?.id === listing.userId;
 
   return (

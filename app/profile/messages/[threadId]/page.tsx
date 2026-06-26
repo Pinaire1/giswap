@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import ChatClient from "./ui";
 import { redirect, notFound } from "next/navigation";
+import { threadChatInclude } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -17,15 +18,7 @@ export default async function ThreadPage({
 
   const thread = await prisma.messageThread.findUnique({
     where: { id: threadId },
-    include: {
-      listing: { select: { id: true, title: true, images: true } },
-      buyer: { select: { id: true, name: true, image: true } },
-      seller: { select: { id: true, name: true, image: true } },
-      messages: {
-        include: { from: true },
-        orderBy: { createdAt: "asc" },
-      },
-    },
+    include: threadChatInclude,
   });
 
   if (!thread) notFound();

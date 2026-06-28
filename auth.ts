@@ -2,19 +2,27 @@ import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import Google from "next-auth/providers/google";
 import { prisma } from "@/lib/prisma";
+import { getAuthEnv, logAuthConfigIssues } from "@/lib/auth-config";
+
+const authEnv = getAuthEnv();
+logAuthConfigIssues();
+
+const isProduction = process.env.NODE_ENV === "production";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
 
   providers: [
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      checks: ["state"],
+      clientId: authEnv.googleClientId ?? "",
+      clientSecret: authEnv.googleClientSecret ?? "",
+      // Use Auth.js defaults for Google OIDC (PKCE). Do not override with
+      // checks: ["state"] — both PKCE and state cookies fail the same way when
+      // the OAuth callback domain does not match the sign-in domain.
     }),
   ],
 
-  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
+  secret: authEnv.secret,
 
   session: {
     strategy: "jwt",
@@ -37,7 +45,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
   pages: {
     signIn: "/login",
+    error: "/login",
   },
 
   trustHost: true,
+  useSecureCookies: isProduction,
+  debug: process.env.AUTH_DEBUG === "true",
 });

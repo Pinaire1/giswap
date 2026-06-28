@@ -1,13 +1,12 @@
-"use client";
-
-import { signIn } from "next-auth/react";
 import Image from "next/image";
+import Link from "next/link";
+import { GOOGLE_SIGN_IN_URL } from "@/lib/auth-urls";
+import LoginError from "./LoginError";
 
 export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] py-12 px-4">
       <div className="max-w-md w-full">
-        {/* Belt stripe */}
         <div className="belt-gradient h-0.5 w-full rounded-full mb-10 opacity-60" />
 
         <div className="bg-[#111] border border-[#1e2a4a] rounded-3xl p-10 shadow-2xl shadow-blue-950/30">
@@ -17,8 +16,10 @@ export default function LoginPage() {
             <p className="text-gray-500 mt-2 text-sm">Sign in to buy, sell, and connect with grapplers.</p>
           </div>
 
-          <button
-            onClick={() => signIn("google", { callbackUrl: "/" })}
+          <LoginError />
+
+          <Link
+            href={GOOGLE_SIGN_IN_URL}
             className="w-full flex items-center justify-center gap-3 py-4 bg-[#0d0d0d] border border-[#2a3a5a] hover:border-blue-600 rounded-2xl transition text-white font-medium group"
           >
             <Image
@@ -30,7 +31,7 @@ export default function LoginPage() {
               unoptimized
             />
             <span className="group-hover:text-blue-300 transition">Continue with Google</span>
-          </button>
+          </Link>
 
           <div className="mt-8 text-center">
             <div className="flex items-center gap-3 justify-center">

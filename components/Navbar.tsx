@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { Shirt, LogOut, User } from "lucide-react";
 import Image from "next/image";
+import { GOOGLE_SIGN_IN_URL } from "@/lib/auth-urls";
 import { usePathname } from "next/navigation";
 
 const NAV_LINKS = [
@@ -94,18 +95,18 @@ export default function Navbar() {
               </div>
             ) : (
               <>
-                <button
-                  onClick={() => signIn("google")}
+                <Link
+                  href={GOOGLE_SIGN_IN_URL}
                   className="px-5 py-2 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition text-sm"
                 >
                   Log in
-                </button>
-                <button
-                  onClick={() => signIn("google")}
+                </Link>
+                <Link
+                  href={GOOGLE_SIGN_IN_URL}
                   className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition text-sm"
                 >
                   Sign up
-                </button>
+                </Link>
               </>
             )}
           </div>
@@ -150,12 +151,13 @@ export default function Navbar() {
                   </button>
                 </>
               ) : (
-                <button
-                  onClick={() => signIn("google")}
+                <Link
+                  href={GOOGLE_SIGN_IN_URL}
+                  onClick={() => setIsOpen(false)}
                   className="text-left py-3 text-blue-400 hover:text-blue-300 transition font-medium"
                 >
                   Sign in with Google
-                </button>
+                </Link>
               )}
             </div>
           </div>

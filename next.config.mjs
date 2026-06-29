@@ -13,6 +13,7 @@ const nextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
       { protocol: "https", hostname: "utfs.io" },
+      { protocol: "https", hostname: "ufs.io" },
       { protocol: "https", hostname: "uploadthing.com" },
     ],
   },

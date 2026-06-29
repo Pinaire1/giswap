@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
-import { SessionProvider } from "next-auth/react";
 import Providers from "./providers";
 import { Analytics } from "@vercel/analytics/next";
 
@@ -17,11 +16,13 @@ export const metadata: Metadata = {
     description: "Buy and sell new & used BJJ gis. The marketplace built by grapplers, for grapplers.",
     url: BASE_URL,
     type: "website",
+    images: [{ url: "/og-default.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "GiSwap | BJJ Gi Marketplace",
     description: "Buy and sell new & used BJJ gis.",
+    images: ["/og-default.png"],
   },
 };
 
@@ -34,7 +35,6 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen bg-[#0a0a0a] font-sans antialiased">
         <Providers>
-          <SessionProvider>
             <Navbar />
             <main>
               {children}
@@ -54,7 +54,6 @@ export default function RootLayout({
                 </p>
               </div>
             </footer>
-          </SessionProvider>
         </Providers>
       </body>
     </html>

@@ -48,7 +48,7 @@ function SaveButton({ listingId, initialSaved }: { listingId: string; initialSav
   const toggle = (e: React.MouseEvent) => {
     e.stopPropagation();
     startTransition(async () => {
-      const res = await fetch(`/api/listings/${listingId}/save`, { method: "POST" });
+      const res = await fetch(`/api/listings/${listingId}/save`, { method: saved ? "DELETE" : "POST" });
       if (res.ok) setSaved((s) => !s);
     });
   };

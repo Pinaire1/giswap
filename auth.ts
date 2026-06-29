@@ -22,7 +22,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
   callbacks: {
     async jwt({ token, user }) {
-      if (user) token.id = user.id;
+      if (user) {
+        token.id = user.id;
+        const adminEmails = (process.env.ADMIN_EMAILS ?? "").split(",").map((e) => e.trim());
+        token.isAdmin = adminEmails.includes(user.email ?? "");
+      }
       return token;
     },
 
@@ -30,7 +34,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (token?.id) {
         session.user.id = token.id as string;
       }
-
+      session.user.isAdmin = token.isAdmin as boolean | undefined;
       return session;
     },
   },

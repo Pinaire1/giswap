@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { Shirt, LogOut, User } from "lucide-react";
+import { Shirt, LogOut, User, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
@@ -84,6 +84,16 @@ export default function Navbar() {
                   <span className="text-sm font-medium">{session.user?.name?.split(" ")[0]}</span>
                 </Link>
 
+                {session.user?.isAdmin && (
+                  <Link
+                    href="/admin/reports"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-amber-400 hover:bg-amber-950/50 rounded-lg transition"
+                  >
+                    <ShieldCheck size={16} />
+                    Admin
+                  </Link>
+                )}
+
                 <button
                   onClick={() => signOut({ callbackUrl: "/" })}
                   className="flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-950/50 rounded-lg transition"
@@ -142,6 +152,11 @@ export default function Navbar() {
                   <Link href="/profile" onClick={() => setIsOpen(false)} className="py-3 flex items-center gap-3 text-gray-300 hover:text-blue-400 transition">
                     <User size={20} /> Profile
                   </Link>
+                  {session.user?.isAdmin && (
+                    <Link href="/admin/reports" onClick={() => setIsOpen(false)} className="py-3 flex items-center gap-3 text-amber-400 hover:text-amber-300 transition">
+                      <ShieldCheck size={20} /> Admin
+                    </Link>
+                  )}
                   <button
                     onClick={() => { signOut({ callbackUrl: "/" }); setIsOpen(false); }}
                     className="py-3 flex items-center gap-3 text-red-400 text-left"

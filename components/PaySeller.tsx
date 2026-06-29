@@ -18,7 +18,6 @@ function CopyButton({ value, label }: { value: string; label: string }) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback for older browsers
       const el = document.createElement("textarea");
       el.value = value;
       document.body.appendChild(el);
@@ -56,50 +55,67 @@ export default function PaySeller({
   price,
   sellerName,
 }: PaySellerProps) {
-  if (!paypalHandle && !venmoHandle) return null;
+  const hasHandles = !!(paypalHandle || venmoHandle);
 
   return (
     <div className="bg-[#111] border border-[#1e2a4a] rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6">
       <p className="text-gray-400 text-sm font-medium mb-1">Pay Seller</p>
-      <p className="text-gray-600 text-xs mb-4">
-        Send{" "}
-        <span className="text-amber-400 font-semibold">${price}</span> to{" "}
-        {sellerName} after agreeing on the deal.
-      </p>
 
-      <div className="space-y-2">
-        {paypalHandle && (
-          <div className="space-y-1.5">
-            <CopyButton value={paypalHandle} label="PayPal" />
-            <a
-              href={`https://www.paypal.com/paypalme/${paypalHandle}/${price}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-[#003087]/20 border border-[#003087]/50 hover:bg-[#003087]/30 text-[#60a5fa] hover:text-white text-xs font-semibold transition"
-            >
-              Open PayPal →
-            </a>
-          </div>
-        )}
-        {venmoHandle && (
-          <div className="space-y-1.5">
-            <CopyButton value={venmoHandle} label="Venmo" />
-            <a
-              href={`https://venmo.com/${venmoHandle}?txn=pay&amount=${price}&note=GiSwap+purchase`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-[#008CFF]/10 border border-[#008CFF]/30 hover:bg-[#008CFF]/20 text-[#60a5fa] hover:text-white text-xs font-semibold transition"
-            >
-              Open Venmo →
-            </a>
-          </div>
-        )}
-      </div>
+      {hasHandles ? (
+        <>
+          <p className="text-gray-600 text-xs mb-4">
+            Send{" "}
+            <span className="text-amber-400 font-semibold">${price} + shipping</span> to{" "}
+            {sellerName}{" "}
+            <span className="text-gray-500">after</span> you confirm the total and delivery
+            method in messages.
+          </p>
 
-      <p className="text-amber-700/80 text-xs mt-4 flex items-start gap-1.5">
-        <span className="mt-px">⚠</span>
-        Always confirm the deal via messages before sending payment.
-      </p>
+          <div className="space-y-2">
+            {paypalHandle && (
+              <div className="space-y-1.5">
+                <CopyButton value={paypalHandle} label="PayPal" />
+                <a
+                  href={`https://www.paypal.com/paypalme/${paypalHandle}/${price}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-[#003087]/20 border border-[#003087]/50 hover:bg-[#003087]/30 text-[#60a5fa] hover:text-white text-xs font-semibold transition"
+                >
+                  Open PayPal →
+                </a>
+              </div>
+            )}
+            {venmoHandle && (
+              <div className="space-y-1.5">
+                <CopyButton value={venmoHandle} label="Venmo" />
+                <a
+                  href={`https://venmo.com/${venmoHandle}?txn=pay&amount=${price}&note=GiSwap+purchase`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-[#008CFF]/10 border border-[#008CFF]/30 hover:bg-[#008CFF]/20 text-[#60a5fa] hover:text-white text-xs font-semibold transition"
+                >
+                  Open Venmo →
+                </a>
+              </div>
+            )}
+          </div>
+
+          <p className="text-amber-700/80 text-xs mt-4 flex items-start gap-1.5">
+            <span className="mt-px">⚠</span>
+            Always confirm shipping cost and delivery in messages before sending payment.
+          </p>
+        </>
+      ) : (
+        <div className="space-y-2">
+          <p className="text-gray-500 text-sm leading-relaxed">
+            {sellerName} hasn&apos;t added payment info yet. Message them to agree on the
+            total — including shipping — and arrange payment.
+          </p>
+          <p className="text-gray-600 text-xs">
+            Sellers can add PayPal or Venmo handles in their profile settings.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

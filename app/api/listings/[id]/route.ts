@@ -3,14 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { auth } from "@/auth";
 
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "").split(",").map((e) => e.trim()).filter(Boolean);
-
-function isAdmin(email: string | null | undefined) {
-  return !!email && ADMIN_EMAILS.includes(email);
-}
-
-async function canModifyListing(userId: string, userEmail: string | null | undefined, listingId: string) {
-  if (isAdmin(userEmail)) return true;
+async function canModifyListing(userId: string, isAdmin: boolean, listingId: string) {
+  if (isAdmin) return true;
   const listing = await prisma.listing.findUnique({
     where: { id: listingId },
     select: { userId: true },
@@ -29,8 +23,9 @@ export async function PATCH(
   }
 
   const { id } = await params;
+  const isAdmin = !!session.user.isAdmin;
 
-  if (!(await canModifyListing(session.user.id, session.user.email, id))) {
+  if (!(await canModifyListing(session.user.id, isAdmin, id))) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -45,7 +40,7 @@ export async function PATCH(
   if ("description" in body) data.description = String(body.description);
   if ("images"      in body) data.images      = body.images as string[];
   if ("isSold"      in body) data.isSold      = Boolean(body.isSold);
-  if ("isHidden"    in body && isAdmin(session.user.email)) data.isHidden = Boolean(body.isHidden);
+  if ("isHidden"    in body && isAdmin) data.isHidden = Boolean(body.isHidden);
 
   const listing = await prisma.listing.update({ where: { id }, data });
   return NextResponse.json({ success: true, listing });
@@ -63,7 +58,7 @@ export async function DELETE(
 
   const { id } = await params;
 
-  if (!(await canModifyListing(session.user.id, session.user.email, id))) {
+  if (!(await canModifyListing(session.user.id, !!session.user.isAdmin, id))) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

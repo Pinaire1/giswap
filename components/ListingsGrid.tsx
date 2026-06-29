@@ -82,6 +82,14 @@ export default function ListingsGrid({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [messagingListing, setMessagingListing] = useState<Listing | null>(null);
+  const [modalMessage, setModalMessage] = useState("");
+
+  const QUICK_REPLIES = [
+    "Is this still available?",
+    "What's the shipping cost?",
+    "Can I pick this up locally?",
+    "When can you ship?",
+  ];
 
   const pageHref = (p: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -186,6 +194,7 @@ export default function ListingsGrid({
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
+                          setModalMessage("");
                           setMessagingListing(listing);
                         }}
                         className="flex-1 py-2.5 bg-transparent hover:bg-purple-950/40 border border-[#2a2a4a] hover:border-purple-600 text-gray-400 hover:text-purple-300 rounded-xl font-medium text-xs transition active:scale-95"
@@ -231,17 +240,34 @@ export default function ListingsGrid({
                   </p>
                 </div>
                 <button
-                  onClick={() => setMessagingListing(null)}
+                  onClick={() => {
+                    setMessagingListing(null);
+                    setModalMessage("");
+                  }}
                   aria-label="Close message dialog"
                   className="text-gray-600 hover:text-white text-2xl leading-none transition"
                 >
                   ×
                 </button>
               </div>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {QUICK_REPLIES.map((reply) => (
+                  <button
+                    key={reply}
+                    type="button"
+                    onClick={() => setModalMessage(reply)}
+                    className="px-3 py-1.5 text-[11px] font-medium rounded-xl border border-[#1e2a4a] text-gray-500 hover:border-purple-600 hover:text-purple-300 transition"
+                  >
+                    {reply}
+                  </button>
+                ))}
+              </div>
               <MessageSeller
                 sellerId={messagingListing.userId}
                 listingId={messagingListing.id}
                 sellerName={messagingListing.user.name ?? "Seller"}
+                message={modalMessage}
+                onMessageChange={setModalMessage}
               />
             </motion.div>
           </motion.div>

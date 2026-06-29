@@ -7,17 +7,25 @@ interface MessageSellerProps {
   sellerName: string;
   sellerId: string;
   listingId: string;
+  message?: string;
+  onMessageChange?: (message: string) => void;
 }
 
 export default function MessageSeller({
   sellerId,
   listingId,
   sellerName,
+  message: controlledMessage,
+  onMessageChange,
 }: MessageSellerProps) {
   const router = useRouter();
-  const [message, setMessage] = useState("");
+  const [internalMessage, setInternalMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState("");
+
+  const isControlled = controlledMessage !== undefined && onMessageChange !== undefined;
+  const message = isControlled ? controlledMessage : internalMessage;
+  const setMessage = isControlled ? onMessageChange : setInternalMessage;
 
   const sendMessage = async () => {
     if (!message.trim()) return;

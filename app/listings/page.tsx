@@ -5,6 +5,11 @@ import FilterBar from "@/components/FilterBar";
 import { Suspense } from "react";
 import type { Prisma } from "@prisma/client";
 
+const KNOWN_BRANDS = [
+  "Shoyoroll", "Tatami", "Kingz", "Scramble", "Hyperfly",
+  "Fuji", "Venum", "Sanabul", "Flow", "Gameness",
+];
+
 export const dynamic = "force-dynamic";
 
 export default async function ListingsPage({
@@ -45,7 +50,11 @@ export default async function ListingsPage({
   }
   if (size) where.size = size;
   if (condition) where.condition = condition;
-  if (brand) where.brand = { contains: brand, mode: "insensitive" };
+  if (brand === "other") {
+    where.NOT = { brand: { in: KNOWN_BRANDS, mode: "insensitive" } };
+  } else if (brand) {
+    where.brand = { contains: brand, mode: "insensitive" };
+  }
   if (minPrice || maxPrice) {
     where.price = {};
     if (minPrice) (where.price as Prisma.DecimalFilter).gte = parseFloat(minPrice);

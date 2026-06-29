@@ -10,6 +10,8 @@ const BRANDS = [
   "Fuji", "Venum", "Sanabul", "Flow", "Gameness",
 ];
 
+const OTHER_BRAND_VALUE = "other";
+
 export default function FilterBar({ total }: { total: number }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -126,6 +128,12 @@ export default function FilterBar({ total }: { total: number }) {
               {b}
             </button>
           ))}
+          <button
+            onClick={() => toggle("brand", OTHER_BRAND_VALUE)}
+            className={`${chipBase} ${get("brand") === OTHER_BRAND_VALUE ? chipOn : chipOff}`}
+          >
+            Other
+          </button>
         </div>
       </div>
 

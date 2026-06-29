@@ -7,7 +7,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://giswap.vercel.app";
 
   const listings = await prisma.listing.findMany({
-    where: { isSold: false },
+    where: { isSold: false, isHidden: false },
     select: { id: true, updatedAt: true },
     orderBy: { createdAt: "desc" },
     take: 1000,

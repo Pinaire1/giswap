@@ -8,6 +8,7 @@ const VALID_CONDITIONS = ["New", "Like New", "Good", "Worn"];
 export async function GET() {
   try {
     const listings = await prisma.listing.findMany({
+      where: { isHidden: false },
       orderBy: { createdAt: "desc" },
       include: {
         user: { select: { id: true, name: true, email: true, image: true } },

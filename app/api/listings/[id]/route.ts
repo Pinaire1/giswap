@@ -45,6 +45,7 @@ export async function PATCH(
   if ("description" in body) data.description = String(body.description);
   if ("images"      in body) data.images      = body.images as string[];
   if ("isSold"      in body) data.isSold      = Boolean(body.isSold);
+  if ("isHidden"    in body && isAdmin(session.user.email)) data.isHidden = Boolean(body.isHidden);
 
   const listing = await prisma.listing.update({ where: { id }, data });
   return NextResponse.json({ success: true, listing });

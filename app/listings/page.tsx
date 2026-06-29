@@ -35,7 +35,7 @@ export default async function ListingsPage({
 
   const session = await auth();
 
-  const where: Prisma.ListingWhereInput = { isSold: false };
+  const where: Prisma.ListingWhereInput = { isSold: false, isHidden: false };
 
   if (q) {
     where.OR = [

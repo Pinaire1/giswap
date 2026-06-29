@@ -105,10 +105,14 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
   };
 
   return (
-    <div className="max-w-2xl mx-auto h-[calc(100vh-64px)] flex flex-col">
+    <div className="page-container-narrow h-[calc(100dvh-4rem)] flex flex-col">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-[#1e2a4a] bg-[#0d0d0d]">
-        <Link href="/profile/messages" className="text-gray-500 hover:text-blue-400 mr-1 transition text-lg">
+      <div className="flex items-center gap-3 px-1 py-3 border-b border-[#1e2a4a] bg-[#0d0d0d] shrink-0">
+        <Link
+          href="/profile/messages"
+          aria-label="Back to messages"
+          className="text-gray-500 hover:text-blue-400 transition p-2 -ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+        >
           ←
         </Link>
 
@@ -138,9 +142,12 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-[#0a0a0a]">
+      <div className="flex-1 overflow-y-auto px-1 sm:px-2 py-4 space-y-3 bg-[#0a0a0a]" role="log" aria-live="polite" aria-label="Conversation">
         {messages.length === 0 && (
-          <p className="text-center text-gray-700 text-sm mt-8">No messages yet. Say hello!</p>
+          <div className="text-center py-12">
+            <p className="text-4xl mb-3 opacity-20" aria-hidden="true">👋</p>
+            <p className="text-gray-600 text-sm">No messages yet. Say hello!</p>
+          </div>
         )}
 
         {messages.map((msg) => {
@@ -166,19 +173,22 @@ export default function ChatClient({ thread, currentUserId }: ChatClientProps) {
       </div>
 
       {/* Input */}
-      <div className="px-4 py-3 border-t border-[#1e2a4a] bg-[#0d0d0d] flex gap-2 items-center">
+      <div className="px-1 py-3 border-t border-[#1e2a4a] bg-[#0d0d0d] flex gap-2 items-center shrink-0">
+        <label htmlFor="chat-input" className="sr-only">Message</label>
         <input
+          id="chat-input"
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Type a message…"
-          className="flex-1 bg-[#111] border border-[#1e2a4a] rounded-full px-4 py-2.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-blue-600 transition"
+          className="input flex-1 rounded-full"
         />
 
         <button
           onClick={sendMessage}
           disabled={loading || !text.trim()}
-          className="bg-blue-700 hover:bg-blue-600 disabled:bg-[#1a1a1a] disabled:text-gray-600 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-full text-sm font-semibold transition"
+          aria-label="Send message"
+          className="btn-primary rounded-full px-5 py-2.5 min-h-[44px] shrink-0"
         >
           {loading ? "…" : "Send"}
         </button>

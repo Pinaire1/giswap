@@ -59,7 +59,7 @@ export default function PaySeller({
   if (!paypalHandle && !venmoHandle) return null;
 
   return (
-    <div className="bg-[#111] border border-[#1e2a4a] rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6">
+    <div className="card p-4 sm:p-5 mb-5 sm:mb-6 rounded-2xl">
       <p className="text-gray-400 text-sm font-medium mb-1">Pay Seller</p>
       <p className="text-gray-600 text-xs mb-4">
         Send{" "}

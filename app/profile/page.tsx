@@ -20,14 +20,22 @@ export default async function ProfilePage() {
     },
   });
 
-  if (!user) return <div className="p-10 text-gray-500">User not found.</div>;
+  if (!user) {
+    return (
+      <main className="page-container max-w-6xl">
+        <div className="empty-state">
+          <p className="empty-state-title">User not found</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
-    <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <main className="page-container max-w-6xl">
       {/* Profile Header */}
-      <div className="bg-[#111] border border-[#1e2a4a] rounded-3xl p-5 sm:p-8 mb-10">
-        <div className="belt-gradient h-0.5 w-16 rounded-full mb-6 opacity-60" />
-        <div className="flex items-center gap-5">
+      <div className="card p-5 sm:p-8 mb-8 sm:mb-10">
+        <div className="page-accent" />
+        <div className="flex flex-col sm:flex-row sm:items-center gap-5">
           {user.image ? (
             <Image
               src={user.image}
@@ -51,9 +59,9 @@ export default async function ProfilePage() {
       </div>
 
       {/* My Listings */}
-      <section className="mb-10">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-black text-white">My Listings</h2>
+      <section className="mb-8 sm:mb-10">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+          <h2 className="text-xl sm:text-2xl font-black text-white">My Listings</h2>
           <Link href="/listings/new" className="text-blue-400 hover:text-blue-300 text-sm transition">
             + New Listing
           </Link>
@@ -81,15 +89,19 @@ export default async function ProfilePage() {
 
       {/* Inbox */}
       <section>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-black text-white">Inbox</h2>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+          <h2 className="text-xl sm:text-2xl font-black text-white">Inbox</h2>
           <Link href="/profile/messages" className="text-purple-400 hover:text-purple-300 text-sm transition">
             View all messages →
           </Link>
         </div>
 
-        <div className="bg-[#111] border border-[#1e2a4a] rounded-3xl p-8 text-center">
-          <p className="text-gray-600 text-sm">Go to your inbox to read and reply to messages.</p>
+        <div className="card p-6 sm:p-8 text-center">
+          <p className="text-4xl mb-3 opacity-20" aria-hidden="true">💬</p>
+          <p className="text-gray-500 text-sm">Go to your inbox to read and reply to messages.</p>
+          <Link href="/profile/messages" className="btn-primary text-sm mt-4 inline-flex">
+            Open inbox
+          </Link>
         </div>
       </section>
     </main>

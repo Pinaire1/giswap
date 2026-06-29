@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { UploadButton } from "@/lib/uploadthing";
 import Image from "next/image";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const COMMON_BRANDS = [
   "Shoyoroll", "Tatami", "Kingz", "Scramble", "Hyperfly",
@@ -27,9 +28,13 @@ export default function NewListingPage() {
     if (status === "unauthenticated") router.push("/login");
   }, [status, router]);
 
-  if (status === "loading") return (
-    <div className="min-h-screen flex items-center justify-center text-gray-500">Loading...</div>
-  );
+  if (status === "loading") {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <LoadingSpinner label="Loading" />
+      </div>
+    );
+  }
   if (!session) return null;
 
   const brand = selectedBrand === "Other" ? customBrand : selectedBrand;
@@ -72,14 +77,14 @@ export default function NewListingPage() {
     }
   };
 
-  const inputClass = "w-full p-4 bg-[#0d0d0d] border border-[#1e2a4a] rounded-2xl text-white placeholder:text-gray-600 focus:border-blue-600 focus:outline-none transition";
+  const inputClass = "input";
   const labelClass = "block text-sm font-medium mb-2 text-gray-400";
   const chipBase = "border-2 border-[#1e2a4a] bg-[#0d0d0d] hover:bg-[#161626] rounded-2xl px-3 py-3 cursor-pointer text-center transition-all font-medium text-gray-400 min-h-[44px] flex items-center justify-center";
   const chipActive = "border-blue-600 text-blue-300 bg-[#0d0d20]";
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-      <div className="belt-gradient h-0.5 w-16 rounded-full mb-6 opacity-70" />
+    <div className="page-container max-w-3xl">
+      <div className="page-accent" />
 
       <motion.h1
         initial={{ opacity: 0, y: -30 }}
@@ -92,7 +97,7 @@ export default function NewListingPage() {
 
       <motion.form
         onSubmit={handleSubmit}
-        className="space-y-8 bg-[#111] p-5 sm:p-10 rounded-3xl border border-[#1e2a4a]"
+        className="space-y-8 card p-5 sm:p-10"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
       >
@@ -222,7 +227,7 @@ export default function NewListingPage() {
           disabled={isSubmitting || !brand || !selectedSize}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
-          className="w-full bg-blue-700 hover:bg-blue-600 disabled:bg-[#1a1a1a] disabled:text-gray-600 text-white py-5 rounded-2xl font-black text-xl tracking-wider transition"
+          className="w-full btn-primary py-5 text-lg sm:text-xl tracking-wider min-h-[56px] disabled:opacity-50"
         >
           {isSubmitting ? "THROWING ON THE MAT…" : "POST TO THE MAT"}
         </motion.button>

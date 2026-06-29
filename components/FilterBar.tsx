@@ -59,24 +59,27 @@ export default function FilterBar({ total }: { total: number }) {
         <input
           type="text"
           placeholder="Search brand or title…"
+          aria-label="Search listings"
           defaultValue={get("q")}
           onChange={(e) => update({ q: e.target.value })}
-          className="flex-1 p-3 bg-[#111] border border-[#1e2a4a] rounded-2xl text-white placeholder:text-gray-600 focus:border-blue-600 focus:outline-none transition text-sm"
+          className="input flex-1"
         />
         <div className="flex gap-2 w-full sm:w-auto">
           <input
             type="number"
             placeholder="Min $"
+            aria-label="Minimum price"
             defaultValue={get("minPrice")}
             onChange={(e) => update({ minPrice: e.target.value })}
-            className="flex-1 min-w-0 sm:w-24 sm:flex-none p-3 bg-[#111] border border-[#1e2a4a] rounded-2xl text-white placeholder:text-gray-600 focus:border-blue-600 focus:outline-none transition text-sm"
+            className="input flex-1 min-w-0 sm:w-24 sm:flex-none"
           />
           <input
             type="number"
             placeholder="Max $"
+            aria-label="Maximum price"
             defaultValue={get("maxPrice")}
             onChange={(e) => update({ maxPrice: e.target.value })}
-            className="flex-1 min-w-0 sm:w-24 sm:flex-none p-3 bg-[#111] border border-[#1e2a4a] rounded-2xl text-white placeholder:text-gray-600 focus:border-blue-600 focus:outline-none transition text-sm"
+            className="input flex-1 min-w-0 sm:w-24 sm:flex-none"
           />
         </div>
       </div>
@@ -88,6 +91,8 @@ export default function FilterBar({ total }: { total: number }) {
           {SIZES.map((s) => (
             <button
               key={s}
+              type="button"
+              aria-pressed={get("size") === s}
               onClick={() => toggle("size", s)}
               className={`${chipBase} ${get("size") === s ? chipOn : chipOff}`}
             >
@@ -104,6 +109,8 @@ export default function FilterBar({ total }: { total: number }) {
           {CONDITIONS.map((c) => (
             <button
               key={c}
+              type="button"
+              aria-pressed={get("condition") === c}
               onClick={() => toggle("condition", c)}
               className={`${chipBase} ${get("condition") === c ? chipOn : chipOff}`}
             >
@@ -120,6 +127,8 @@ export default function FilterBar({ total }: { total: number }) {
           {BRANDS.map((b) => (
             <button
               key={b}
+              type="button"
+              aria-pressed={get("brand") === b}
               onClick={() => toggle("brand", b)}
               className={`${chipBase} ${get("brand") === b ? chipOn : chipOff}`}
             >

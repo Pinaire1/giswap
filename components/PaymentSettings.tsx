@@ -44,11 +44,10 @@ export default function PaymentSettings({
     }
   };
 
-  const inputClass =
-    "w-full p-3 bg-[#0d0d0d] border border-[#1e2a4a] rounded-xl text-white placeholder:text-gray-600 focus:border-blue-600 focus:outline-none transition text-sm";
+  const inputClass = "input";
 
   return (
-    <section className="bg-[#111] border border-[#1e2a4a] rounded-3xl p-6 sm:p-8 mb-10">
+    <section className="card p-6 sm:p-8 mb-8 sm:mb-10">
       <h2 className="text-xl font-black text-white mb-1">Payment Methods</h2>
       <p className="text-gray-500 text-sm mb-6">
         Buyers will see these on your listings so they can pay you directly.
@@ -96,7 +95,7 @@ export default function PaymentSettings({
         <button
           onClick={save}
           disabled={saving}
-          className="px-6 py-2.5 bg-blue-700 hover:bg-blue-600 disabled:bg-[#1a1a1a] disabled:text-gray-600 text-white rounded-xl font-semibold text-sm transition"
+          className="btn-primary min-h-[44px]"
         >
           {saving ? "Saving…" : "Save Payment Info"}
         </button>

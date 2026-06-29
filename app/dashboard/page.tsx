@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import PageHeader from "@/components/ui/PageHeader";
 
 type Stats = {
   activeListings: number;
@@ -31,11 +32,7 @@ export default function DashboardPage() {
   }, [status]);
 
   if (status === "loading") {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500">
-        Loading dashboard...
-      </div>
-    );
+    return null;
   }
   if (!session) return null;
 
@@ -61,71 +58,58 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-      <div className="belt-gradient h-0.5 w-16 rounded-full mb-8 opacity-70" />
+    <div className="page-container max-w-6xl">
+      <PageHeader
+        title={`Welcome back, ${session.user?.name?.split(" ")[0]}!`}
+        subtitle="Here's what's happening with your gear"
+      />
 
-      <motion.h1
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-3xl sm:text-5xl font-black mb-1 text-white tracking-tight"
-      >
-        Welcome back, {session.user?.name?.split(" ")[0]}!
-      </motion.h1>
-      <p className="text-blue-400 text-lg mb-12">
-        Here&apos;s what&apos;s happening with your gear
-      </p>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-10 sm:mb-12">
         {statCards.map(({ label, value, color, border }, i) => (
           <motion.div
             key={label}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.08 }}
-            className={`bg-[#111] border ${border} rounded-3xl p-8`}
+            className={`card ${border} p-6 sm:p-8`}
           >
             <p className="text-gray-500 text-sm mb-2">{label}</p>
-            <p className={`text-6xl font-black ${color}`}>{value}</p>
+            <p className={`text-4xl sm:text-6xl font-black tabular-nums ${color}`}>{value}</p>
           </motion.div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-[#111] border border-[#1e2a4a] rounded-3xl p-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+        <div className="card p-6 sm:p-8">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-white">My Listings</h2>
-            <Link
-              href="/listings/new"
-              className="text-blue-400 hover:text-blue-300 text-sm transition"
-            >
+            <h2 className="text-xl sm:text-2xl font-bold text-white">My Listings</h2>
+            <Link href="/listings/new" className="text-blue-400 hover:text-blue-300 text-sm transition">
               + New Listing
             </Link>
           </div>
-          <p className="text-gray-600 text-center py-12">
-            <Link href="/profile" className="text-blue-400 hover:underline">
-              View &amp; manage your listings →
+          <div className="text-center py-8 sm:py-12">
+            <p className="text-4xl mb-3 opacity-20" aria-hidden="true">📦</p>
+            <p className="text-gray-500 text-sm mb-4">View, edit, and mark your gis as sold.</p>
+            <Link href="/profile" className="btn-primary text-sm">
+              View listings →
             </Link>
-          </p>
+          </div>
         </div>
 
-        <div className="bg-[#111] border border-[#1e2a4a] rounded-3xl p-8">
-          <h2 className="text-2xl font-bold text-white mb-6">Messages</h2>
-          <p className="text-gray-600 text-center py-12">
-            <Link
-              href="/profile/messages"
-              className="text-purple-400 hover:underline"
-            >
+        <div className="card p-6 sm:p-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-6">Messages</h2>
+          <div className="text-center py-8 sm:py-12">
+            <p className="text-4xl mb-3 opacity-20" aria-hidden="true">💬</p>
+            <p className="text-gray-500 text-sm mb-4">Reply to buyers and sellers about your listings.</p>
+            <Link href="/profile/messages" className="btn-primary text-sm">
               Open inbox →
             </Link>
-          </p>
+          </div>
         </div>
       </div>
 
-      <div className="mt-12 text-center">
-        <Link
-          href="/profile"
-          className="text-blue-400 hover:text-blue-300 transition text-sm"
-        >
+      <div className="mt-10 sm:mt-12 text-center">
+        <Link href="/profile" className="text-blue-400 hover:text-blue-300 transition text-sm">
           Manage Profile & Settings →
         </Link>
       </div>

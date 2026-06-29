@@ -37,6 +37,9 @@ export default function ImageGallery({
           {images.map((img, i) => (
             <button
               key={i}
+              type="button"
+              aria-label={`View photo ${i + 1} of ${images.length}`}
+              aria-current={i === active ? "true" : undefined}
               onClick={() => setActive(i)}
               className={`aspect-square rounded-xl overflow-hidden border relative transition-all ${
                 i === active

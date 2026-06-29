@@ -34,8 +34,7 @@ export default function EditListingForm({ listing }: { listing: ListingData }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const inputClass =
-    "w-full p-4 bg-[#0d0d0d] border border-[#1e2a4a] rounded-2xl text-white placeholder:text-gray-600 focus:border-blue-600 focus:outline-none transition";
+  const inputClass = "input";
   const labelClass = "block text-sm font-medium mb-2 text-gray-400";
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,15 +72,12 @@ export default function EditListingForm({ listing }: { listing: ListingData }) {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-      <div className="belt-gradient h-0.5 w-16 rounded-full mb-6 opacity-70" />
-      <h1 className="text-4xl font-black text-white mb-2">Edit Listing</h1>
-      <p className="text-blue-400 mb-10 text-sm">Changes save immediately to the marketplace.</p>
+    <div className="page-container max-w-3xl">
+      <div className="page-accent" />
+      <h1 className="page-title text-4xl mb-2">Edit Listing</h1>
+      <p className="page-subtitle text-sm mb-8 sm:mb-10">Changes save immediately to the marketplace.</p>
 
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-8 bg-[#111] p-5 sm:p-10 rounded-3xl border border-[#1e2a4a]"
-      >
+      <form onSubmit={handleSubmit} className="space-y-8 card p-5 sm:p-10">
         <div>
           <label className={labelClass}>Brand</label>
           <input
@@ -197,14 +193,14 @@ export default function EditListingForm({ listing }: { listing: ListingData }) {
           <button
             type="button"
             onClick={() => router.push("/profile")}
-            className="flex-1 py-4 rounded-2xl border border-[#1e2a4a] text-gray-400 hover:text-white hover:border-gray-600 transition font-semibold"
+            className="flex-1 btn-outline py-4 min-h-[48px] font-semibold"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={saving}
-            className="flex-1 bg-blue-700 hover:bg-blue-600 disabled:bg-[#1a1a1a] disabled:text-gray-600 text-white py-4 rounded-2xl font-black transition"
+            className="flex-1 btn-primary py-4 min-h-[48px] font-black"
           >
             {saving ? "Saving…" : "Save Changes"}
           </button>

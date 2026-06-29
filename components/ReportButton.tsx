@@ -69,8 +69,11 @@ export default function ReportButton({ listingId }: { listingId: string }) {
           aria-modal="true"
           aria-labelledby="report-dialog-title"
           className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setOpen(false);
+          }}
         >
-          <div className="bg-[#111] border border-[#1e2a4a] rounded-t-3xl sm:rounded-3xl p-6 w-full sm:max-w-sm shadow-2xl">
+          <div className="card rounded-t-3xl sm:rounded-3xl p-6 w-full sm:max-w-sm shadow-2xl">
             <div className="flex justify-between items-center mb-5">
               <h3 id="report-dialog-title" className="font-bold text-white">Report Listing</h3>
               <button
@@ -119,7 +122,7 @@ export default function ReportButton({ listingId }: { listingId: string }) {
             <button
               onClick={submit}
               disabled={!reason || submitting}
-              className="w-full py-3 bg-red-700 hover:bg-red-600 disabled:bg-[#1a1a1a] disabled:text-gray-600 text-white rounded-2xl font-semibold text-sm transition"
+              className="w-full btn-primary py-3 min-h-[48px] bg-red-700 hover:bg-red-600"
             >
               {submitting ? "Submitting…" : "Submit Report"}
             </button>

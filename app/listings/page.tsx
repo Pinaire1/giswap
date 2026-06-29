@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import ListingsGrid from "@/components/ListingsGrid";
 import FilterBar from "@/components/FilterBar";
+import PageHeader from "@/components/ui/PageHeader";
 import { Suspense } from "react";
 import type { Prisma } from "@prisma/client";
 
@@ -84,13 +85,8 @@ export default async function ListingsPage({
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-      <div className="mb-8">
-        <div className="belt-gradient h-0.5 w-24 rounded-full mb-6 opacity-70" />
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tighter leading-none mb-3">
-          ON THE MAT
-        </h1>
-      </div>
+    <div className="page-container">
+      <PageHeader title="ON THE MAT" />
 
       <Suspense>
         <FilterBar total={total} />

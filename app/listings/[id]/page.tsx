@@ -89,10 +89,10 @@ export default async function ListingPage({
   const isOwnListing = session?.user?.id === listing.userId;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <div className="page-container max-w-5xl">
       <Link
         href="/listings"
-        className="text-blue-400 hover:text-blue-300 text-sm mb-6 sm:mb-8 inline-flex items-center gap-1 transition"
+        className="text-blue-400 hover:text-blue-300 text-sm mb-6 inline-flex items-center gap-1 transition min-h-[44px]"
       >
         ← Back to listings
       </Link>
@@ -128,22 +128,22 @@ export default async function ListingPage({
           </div>
 
           <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-5 sm:mb-6 text-sm">
-            <div className="bg-[#111] border border-[#1e2a4a] rounded-xl sm:rounded-2xl p-3 sm:p-4">
+            <div className="card p-3 sm:p-4 rounded-xl sm:rounded-2xl">
               <p className="text-gray-500 mb-1">Brand</p>
               <p className="text-white font-semibold">{listing.brand}</p>
             </div>
-            <div className="bg-[#111] border border-[#1e2a4a] rounded-xl sm:rounded-2xl p-3 sm:p-4">
+            <div className="card p-3 sm:p-4 rounded-xl sm:rounded-2xl">
               <p className="text-gray-500 mb-1">Size</p>
               <p className="text-white font-semibold">{listing.size}</p>
             </div>
             {listing.color && (
-              <div className="bg-[#111] border border-[#1e2a4a] rounded-xl sm:rounded-2xl p-3 sm:p-4">
+              <div className="card p-3 sm:p-4 rounded-xl sm:rounded-2xl">
                 <p className="text-gray-500 mb-1">Color</p>
                 <p className="text-white font-semibold">{listing.color}</p>
               </div>
             )}
             {listing.weight && (
-              <div className="bg-[#111] border border-[#1e2a4a] rounded-xl sm:rounded-2xl p-3 sm:p-4">
+              <div className="card p-3 sm:p-4 rounded-xl sm:rounded-2xl">
                 <p className="text-gray-500 mb-1">Weight</p>
                 <p className="text-white font-semibold">{listing.weight}</p>
               </div>
@@ -151,7 +151,7 @@ export default async function ListingPage({
           </div>
 
           {listing.description && (
-            <div className="bg-[#111] border border-[#1e2a4a] rounded-xl sm:rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6">
+            <div className="card p-4 sm:p-5 mb-5 sm:mb-6 rounded-xl sm:rounded-2xl">
               <p className="text-gray-400 text-sm font-medium mb-2">Description</p>
               <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-line">
                 {listing.description}
@@ -160,7 +160,7 @@ export default async function ListingPage({
           )}
 
           {/* Seller card */}
-          <div className="bg-[#111] border border-[#1e2a4a] rounded-xl sm:rounded-2xl p-4 mb-5 sm:mb-6 flex items-center gap-3">
+          <div className="card p-4 mb-5 sm:mb-6 rounded-xl sm:rounded-2xl flex items-center gap-3">
             {listing.user.image ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -195,7 +195,7 @@ export default async function ListingPage({
             <div className="flex gap-3">
               <Link
                 href={`/listings/${listing.id}/edit`}
-                className="flex-1 text-center py-3 bg-[#111] border border-[#1e2a4a] hover:border-blue-600 text-gray-300 hover:text-blue-300 rounded-2xl font-medium text-sm transition"
+                className="flex-1 text-center btn-outline py-3 min-h-[48px]"
               >
                 Edit Listing
               </Link>

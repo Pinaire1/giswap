@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import EmptyState from "@/components/ui/EmptyState";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -55,16 +56,11 @@ export default function ProfileListings({ listings }: { listings: Listing[] }) {
 
   if (items.length === 0) {
     return (
-      <div className="bg-[#111] border border-[#1e2a4a] rounded-3xl p-10 text-center">
-        <p className="text-7xl mb-4 opacity-30">🥋</p>
-        <p className="text-gray-500">You haven&apos;t listed any gis yet.</p>
-        <Link
-          href="/listings/new"
-          className="mt-4 inline-block text-blue-400 hover:underline text-sm"
-        >
-          Post your first gi →
-        </Link>
-      </div>
+      <EmptyState
+        title="You haven't listed any gis yet"
+        description="Post your first gi and reach the BJJ community."
+        action={{ href: "/listings/new", label: "Post your first gi" }}
+      />
     );
   }
 
@@ -75,7 +71,7 @@ export default function ProfileListings({ listings }: { listings: Listing[] }) {
         return (
           <div
             key={listing.id}
-            className="bg-[#111] border border-[#1e2a4a] rounded-3xl overflow-hidden hover:border-blue-700/50 transition"
+            className="card card-hover overflow-hidden"
           >
             {listing.images?.length > 0 ? (
               <div className="h-44 relative">

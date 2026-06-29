@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { Shirt, LogOut, User, ShieldCheck } from "lucide-react";
+import { Shirt, LogOut, User, ShieldCheck, Menu, X } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const NAV_LINKS = [
   { href: "/listings", label: "Browse Gis" },
@@ -23,6 +24,13 @@ export default function Navbar() {
     href === "/listings"
       ? pathname === "/listings" || (pathname.startsWith("/listings/") && !pathname.startsWith("/listings/new"))
       : pathname.startsWith(href);
+
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
   const linkClass = (href: string) =>
     `whitespace-nowrap text-sm lg:text-base transition-colors ${
@@ -64,7 +72,7 @@ export default function Navbar() {
           {/* Desktop Auth + Profile */}
           <div className="hidden md:flex items-center gap-2 lg:gap-4">
             {status === "loading" ? (
-              <div className="text-gray-500 text-sm">Loading...</div>
+              <LoadingSpinner label="Loading account" size="sm" />
             ) : session ? (
               <div className="flex items-center gap-4">
                 <Link href="/profile" className="flex items-center gap-3 hover:text-blue-400 transition text-white">
@@ -96,7 +104,7 @@ export default function Navbar() {
 
                 <button
                   onClick={() => signOut({ callbackUrl: "/" })}
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-950/50 rounded-lg transition"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-950/50 rounded-lg transition min-h-[44px]"
                 >
                   <LogOut size={16} />
                   Logout
@@ -112,7 +120,7 @@ export default function Navbar() {
                 </button>
                 <button
                   onClick={() => signIn("google")}
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition text-sm"
+                  className="btn-primary px-6 py-2 text-sm rounded-xl"
                 >
                   Sign up
                 </button>
@@ -126,22 +134,26 @@ export default function Navbar() {
             aria-label={isOpen ? "Close menu" : "Open menu"}
             aria-expanded={isOpen}
             aria-controls="mobile-menu"
-            className="md:hidden text-white text-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded w-11 h-11 flex items-center justify-center"
+            className="md:hidden text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg w-11 h-11 flex items-center justify-center"
           >
-            {isOpen ? "✕" : "☰"}
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
         {/* Mobile Menu */}
-        {isOpen && (
-          <div id="mobile-menu" className="md:hidden py-4 border-t border-[#1e2a4a]">
-            <div className="flex flex-col text-base">
+        <div
+          id="mobile-menu"
+          className={`md:hidden overflow-hidden transition-all duration-300 ease-out ${
+            isOpen ? "max-h-[480px] opacity-100 border-t border-[#1e2a4a]" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="py-4">
               {NAV_LINKS.map(({ href, label }) => (
                 <Link
                   key={href}
                   href={href}
                   onClick={() => setIsOpen(false)}
-                  className={mobileLinkClass(href)}
+                  className={`${mobileLinkClass(href)} min-h-[44px] flex items-center`}
                 >
                   {label}
                 </Link>
@@ -172,9 +184,8 @@ export default function Navbar() {
                   Sign in with Google
                 </button>
               )}
-            </div>
           </div>
-        )}
+        </div>
       </div>
     </nav>
   );

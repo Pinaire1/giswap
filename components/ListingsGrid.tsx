@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Heart } from "lucide-react";
 import MessageSeller from "@/components/messageseller";
+import EmptyState from "@/components/ui/EmptyState";
 
 type Listing = {
   id: string;
@@ -94,12 +95,12 @@ export default function ListingsGrid({
   return (
     <>
       {listings.length === 0 ? (
-        <div className="text-center py-20">
-          <p className="text-2xl text-gray-600">No gis match your filters.</p>
-          <Link href="/listings" className="mt-4 inline-block text-blue-400 hover:text-blue-300 text-sm transition">
-            Clear filters
-          </Link>
-        </div>
+        <EmptyState
+          icon="🔍"
+          title="No gis match your filters"
+          description="Try adjusting your search or clearing filters to see more listings."
+          action={{ href: "/listings", label: "Clear filters" }}
+        />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
           {listings.map((listing, index) => {
@@ -109,9 +110,18 @@ export default function ListingsGrid({
             return (
               <div
                 key={listing.id}
-                className="card-in group bg-[#111] border border-[#1e2a4a] rounded-2xl overflow-hidden hover:border-blue-600 hover:shadow-lg hover:shadow-blue-900/30 hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col"
+                role="link"
+                tabIndex={0}
+                aria-label={`${listing.title}, $${listing.price}`}
+                className="card-in group card card-hover rounded-2xl overflow-hidden cursor-pointer flex flex-col"
                 style={{ animationDelay: `${Math.min(index * 0.03, 0.3)}s` }}
                 onClick={() => router.push(`/listings/${listing.id}`)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    router.push(`/listings/${listing.id}`);
+                  }
+                }}
               >
                 {/* Image */}
                 <div className="h-52 bg-[#161616] relative overflow-hidden flex-shrink-0">
@@ -163,7 +173,7 @@ export default function ListingsGrid({
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between mt-auto pt-3 border-t border-[#1e2a4a] mt-3">
+                  <div className="flex items-center justify-between pt-3 border-t border-[#1e2a4a]">
                     <p className="text-gray-600 text-xs truncate">
                       {listing.user.name ?? "Seller"}
                     </p>
@@ -177,7 +187,7 @@ export default function ListingsGrid({
                     <Link
                       href={`/listings/${listing.id}`}
                       onClick={(e) => e.stopPropagation()}
-                      className="flex-1 text-center py-2.5 bg-blue-700 hover:bg-blue-600 text-white rounded-xl font-semibold transition active:scale-95 text-xs"
+                      className="flex-1 text-center py-2.5 bg-blue-700 hover:bg-blue-600 text-white rounded-xl font-semibold transition active:scale-95 text-xs min-h-[44px] flex items-center justify-center"
                     >
                       View Gi
                     </Link>
@@ -188,7 +198,7 @@ export default function ListingsGrid({
                           e.stopPropagation();
                           setMessagingListing(listing);
                         }}
-                        className="flex-1 py-2.5 bg-transparent hover:bg-purple-950/40 border border-[#2a2a4a] hover:border-purple-600 text-gray-400 hover:text-purple-300 rounded-xl font-medium text-xs transition active:scale-95"
+                        className="flex-1 py-2.5 bg-transparent hover:bg-purple-950/40 border border-[#2a2a4a] hover:border-purple-600 text-gray-400 hover:text-purple-300 rounded-xl font-medium text-xs transition active:scale-95 min-h-[44px]"
                       >
                         Message
                       </button>
@@ -250,27 +260,21 @@ export default function ListingsGrid({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-3 mt-16">
+        <nav aria-label="Pagination" className="flex justify-center items-center gap-3 mt-12 sm:mt-16">
           {page > 0 && (
-            <Link
-              href={pageHref(page - 1)}
-              className="px-5 py-2.5 bg-[#111] border border-[#1e2a4a] hover:border-blue-600 text-gray-400 hover:text-white rounded-xl text-sm font-medium transition"
-            >
+            <Link href={pageHref(page - 1)} className="btn-outline">
               ← Previous
             </Link>
           )}
-          <span className="text-gray-600 text-sm">
+          <span className="text-gray-600 text-sm tabular-nums">
             Page {page + 1} of {totalPages}
           </span>
           {page < totalPages - 1 && (
-            <Link
-              href={pageHref(page + 1)}
-              className="px-5 py-2.5 bg-[#111] border border-[#1e2a4a] hover:border-blue-600 text-gray-400 hover:text-white rounded-xl text-sm font-medium transition"
-            >
+            <Link href={pageHref(page + 1)} className="btn-outline">
               Next →
             </Link>
           )}
-        </div>
+        </nav>
       )}
     </>
   );

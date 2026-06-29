@@ -31,7 +31,23 @@ export default function ShippingCard({
   preferredCarrier,
 }: Props) {
   const hasDeliveryInfo = pickupAvailable || shippingAvailable;
-  if (!hasDeliveryInfo) return null;
+
+  if (!hasDeliveryInfo) {
+    return (
+      <div className="bg-[#111] border border-[#1e2a4a] rounded-2xl overflow-hidden">
+        <div className="px-5 py-3 border-b border-[#1e2a4a]">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            📦 Delivery
+          </p>
+        </div>
+        <div className="px-5 py-4">
+          <p className="text-sm text-gray-500">
+            Seller hasn&apos;t specified shipping info — message them to arrange delivery or pickup.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const priceNum = parseFloat(price.toString());
   const shippingNum = shippingCost !== null ? parseFloat(shippingCost.toString()) : null;

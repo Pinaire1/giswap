@@ -28,6 +28,13 @@ export default async function EditListingPage({
         price: listing.price.toString(),
         description: listing.description ?? "",
         images: listing.images,
+        pickupAvailable: listing.pickupAvailable,
+        shippingAvailable: listing.shippingAvailable,
+        shippingCost: listing.shippingCost?.toString() ?? "",
+        shipsFromCity: listing.shipsFromCity ?? "",
+        shipsFromState: listing.shipsFromState ?? "",
+        handlingTime: listing.handlingTime ?? "",
+        preferredCarrier: listing.preferredCarrier ?? "",
       }}
     />
   );

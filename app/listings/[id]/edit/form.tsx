@@ -4,6 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { UploadButton } from "@/lib/uploadthing";
+import ShippingSection from "@/components/ShippingSection";
+import {
+  validateShipping,
+  shippingPayload,
+  type ShippingFormState,
+  type Carrier,
+} from "@/lib/shipping";
 
 type ListingData = {
   id: string;
@@ -13,6 +20,13 @@ type ListingData = {
   price: string;
   description: string;
   images: string[];
+  pickupAvailable: boolean;
+  shippingAvailable: boolean;
+  shippingCost: string;
+  shipsFromCity: string;
+  shipsFromState: string;
+  handlingTime: string;
+  preferredCarrier: Carrier | "";
 };
 
 const SIZES = ["A0", "A1", "A2", "A3", "A4", "A5", "A6"];
@@ -34,14 +48,31 @@ export default function EditListingForm({ listing }: { listing: ListingData }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
+  const [shipping, setShipping] = useState<ShippingFormState>({
+    pickupAvailable: listing.pickupAvailable,
+    shippingAvailable: listing.shippingAvailable,
+    shippingCost: listing.shippingCost,
+    shipsFromCity: listing.shipsFromCity,
+    shipsFromState: listing.shipsFromState,
+    handlingTime: listing.handlingTime,
+    preferredCarrier: listing.preferredCarrier,
+  });
+
   const inputClass =
     "w-full p-4 bg-[#0d0d0d] border border-[#1e2a4a] rounded-2xl text-white placeholder:text-gray-600 focus:border-blue-600 focus:outline-none transition";
   const labelClass = "block text-sm font-medium mb-2 text-gray-400";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
     setError("");
+
+    const shippingError = validateShipping(shipping);
+    if (shippingError) {
+      setError(shippingError);
+      return;
+    }
+
+    setSaving(true);
 
     try {
       const res = await fetch(`/api/listings/${listing.id}`, {
@@ -55,11 +86,12 @@ export default function EditListingForm({ listing }: { listing: ListingData }) {
           description,
           images,
           title: `${brand} ${size}`,
+          ...shippingPayload(shipping),
         }),
       });
 
       if (res.ok) {
-        router.push("/profile");
+        router.push(`/listings/${listing.id}`);
         router.refresh();
       } else {
         const data = await res.json();
@@ -182,6 +214,7 @@ export default function EditListingForm({ listing }: { listing: ListingData }) {
                     type="button"
                     onClick={() => setImages((prev) => prev.filter((_, idx) => idx !== i))}
                     className="absolute -top-2 -right-2 w-5 h-5 bg-red-600 rounded-full text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                    aria-label={`Remove photo ${i + 1}`}
                   >
                     ×
                   </button>
@@ -191,7 +224,16 @@ export default function EditListingForm({ listing }: { listing: ListingData }) {
           )}
         </div>
 
-        {error && <p className="text-red-400 text-sm">{error}</p>}
+        {/* Shipping */}
+        <div className="border-t border-[#1e2a4a] pt-8">
+          <ShippingSection value={shipping} onChange={setShipping} />
+        </div>
+
+        {error && (
+          <p role="alert" className="text-red-400 text-sm bg-red-950/40 border border-red-900/40 rounded-xl px-4 py-3">
+            {error}
+          </p>
+        )}
 
         <div className="flex gap-3">
           <button

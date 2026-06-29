@@ -6,6 +6,13 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { UploadButton } from "@/lib/uploadthing";
 import Image from "next/image";
+import ShippingSection from "@/components/ShippingSection";
+import {
+  DEFAULT_SHIPPING_STATE,
+  validateShipping,
+  shippingPayload,
+  type ShippingFormState,
+} from "@/lib/shipping";
 
 const COMMON_BRANDS = [
   "Shoyoroll", "Tatami", "Kingz", "Scramble", "Hyperfly",
@@ -22,6 +29,8 @@ export default function NewListingPage() {
   const [selectedBrand, setSelectedBrand] = useState("");
   const [customBrand, setCustomBrand] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
+  const [shipping, setShipping] = useState<ShippingFormState>(DEFAULT_SHIPPING_STATE);
+  const [formError, setFormError] = useState("");
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/login");
@@ -36,7 +45,19 @@ export default function NewListingPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!selectedSize) return;
+    setFormError("");
+
+    const shippingError = validateShipping(shipping);
+    if (shippingError) {
+      setFormError(shippingError);
+      return;
+    }
+
+    if (!selectedSize) {
+      setFormError("Please select a size.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     const formData = new FormData(e.currentTarget);
@@ -48,6 +69,7 @@ export default function NewListingPage() {
       price: formData.get("price"),
       description: formData.get("description"),
       images: uploadedImages,
+      ...shippingPayload(shipping),
     };
 
     try {
@@ -62,12 +84,12 @@ export default function NewListingPage() {
       if (res.ok) {
         router.push(`/listings/${result.listing.id}`);
       } else {
-        alert("Failed to post gi. Please try again.");
+        setFormError(result?.error ?? "Failed to post gi. Please try again.");
         setIsSubmitting(false);
       }
     } catch (error) {
       console.error(error);
-      alert("Error posting gi. Please try again.");
+      setFormError("Error posting gi. Please try again.");
       setIsSubmitting(false);
     }
   };
@@ -123,7 +145,6 @@ export default function NewListingPage() {
               autoFocus
             />
           )}
-          {/* hidden input so form validation picks up brand */}
           <input type="hidden" name="brand" value={brand} required />
         </div>
 
@@ -189,10 +210,11 @@ export default function NewListingPage() {
             <UploadButton
               endpoint="giImageUploader"
               onClientUploadComplete={(res) => {
-                const urls = res.map((r: any) => r.url); // eslint-disable-line @typescript-eslint/no-explicit-any
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const urls = res.map((r: any) => r.url);
                 setUploadedImages((prev) => [...prev, ...urls]);
               }}
-              onUploadError={(error: Error) => alert(`Upload failed: ${error.message}`)}
+              onUploadError={(error: Error) => setFormError(`Upload failed: ${error.message}`)}
               className="ut-button:bg-blue-700 ut-button:hover:bg-blue-600 ut-button:rounded-xl ut-button:font-semibold"
             />
           </div>
@@ -207,7 +229,7 @@ export default function NewListingPage() {
           )}
         </div>
 
-        {/* Description — optional, last */}
+        {/* Description */}
         <div>
           <label className={labelClass}>Description <span className="text-gray-600">(optional)</span></label>
           <textarea
@@ -216,6 +238,17 @@ export default function NewListingPage() {
             placeholder="How many times used, any repairs, patches, etc..."
           />
         </div>
+
+        {/* Shipping */}
+        <div className="border-t border-[#1e2a4a] pt-8">
+          <ShippingSection value={shipping} onChange={setShipping} />
+        </div>
+
+        {formError && (
+          <p role="alert" className="text-red-400 text-sm bg-red-950/40 border border-red-900/40 rounded-xl px-4 py-3">
+            {formError}
+          </p>
+        )}
 
         <motion.button
           type="submit"

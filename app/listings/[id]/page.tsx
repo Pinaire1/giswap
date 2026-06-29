@@ -6,6 +6,7 @@ import MessageSeller from "@/components/messageseller";
 import ReportButton from "@/components/ReportButton";
 import PaySeller from "@/components/PaySeller";
 import ImageGallery from "@/components/ImageGallery";
+import ShippingCard from "@/components/ShippingCard";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -104,20 +105,18 @@ export default async function ListingPage({
         </div>
 
         {/* Details */}
-        <div className="flex flex-col">
-          <div className="belt-gradient h-0.5 w-16 rounded-full mb-4 sm:mb-6 opacity-60" />
+        <div className="flex flex-col gap-4 sm:gap-5">
+          <div className="belt-gradient h-0.5 w-16 rounded-full opacity-60" />
 
-          <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-2">
+          <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
             {listing.title}
           </h1>
 
-          <div className="flex items-baseline gap-3 sm:gap-4 mb-5 sm:mb-6 flex-wrap">
+          <div className="flex items-baseline gap-3 sm:gap-4 flex-wrap">
             <span className="text-4xl sm:text-5xl font-black text-amber-400">
               ${listing.price.toString()}
             </span>
-            <span
-              className={`px-3 py-1 text-xs font-medium rounded-full border ${condClass}`}
-            >
+            <span className={`px-3 py-1 text-xs font-medium rounded-full border ${condClass}`}>
               {listing.condition}
             </span>
             {listing.isSold && (
@@ -127,7 +126,8 @@ export default async function ListingPage({
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-5 sm:mb-6 text-sm">
+          {/* Brand / Size / Color / Weight */}
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 text-sm">
             <div className="bg-[#111] border border-[#1e2a4a] rounded-xl sm:rounded-2xl p-3 sm:p-4">
               <p className="text-gray-500 mb-1">Brand</p>
               <p className="text-white font-semibold">{listing.brand}</p>
@@ -150,8 +150,9 @@ export default async function ListingPage({
             )}
           </div>
 
+          {/* Description */}
           {listing.description && (
-            <div className="bg-[#111] border border-[#1e2a4a] rounded-xl sm:rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6">
+            <div className="bg-[#111] border border-[#1e2a4a] rounded-xl sm:rounded-2xl p-4 sm:p-5">
               <p className="text-gray-400 text-sm font-medium mb-2">Description</p>
               <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-line">
                 {listing.description}
@@ -159,8 +160,20 @@ export default async function ListingPage({
             </div>
           )}
 
+          {/* Shipping card */}
+          <ShippingCard
+            price={listing.price}
+            pickupAvailable={listing.pickupAvailable}
+            shippingAvailable={listing.shippingAvailable}
+            shippingCost={listing.shippingCost}
+            shipsFromCity={listing.shipsFromCity}
+            shipsFromState={listing.shipsFromState}
+            handlingTime={listing.handlingTime}
+            preferredCarrier={listing.preferredCarrier}
+          />
+
           {/* Seller card */}
-          <div className="bg-[#111] border border-[#1e2a4a] rounded-xl sm:rounded-2xl p-4 mb-5 sm:mb-6 flex items-center gap-3">
+          <div className="bg-[#111] border border-[#1e2a4a] rounded-xl sm:rounded-2xl p-4 flex items-center gap-3">
             {listing.user.image ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -192,14 +205,12 @@ export default async function ListingPage({
           </div>
 
           {isOwnListing ? (
-            <div className="flex gap-3">
-              <Link
-                href={`/listings/${listing.id}/edit`}
-                className="flex-1 text-center py-3 bg-[#111] border border-[#1e2a4a] hover:border-blue-600 text-gray-300 hover:text-blue-300 rounded-2xl font-medium text-sm transition"
-              >
-                Edit Listing
-              </Link>
-            </div>
+            <Link
+              href={`/listings/${listing.id}/edit`}
+              className="text-center py-3 bg-[#111] border border-[#1e2a4a] hover:border-blue-600 text-gray-300 hover:text-blue-300 rounded-2xl font-medium text-sm transition"
+            >
+              Edit Listing
+            </Link>
           ) : (
             <>
               {!listing.isSold && (
@@ -209,7 +220,6 @@ export default async function ListingPage({
                     listingId={listing.id}
                     sellerName={listing.user.name ?? "Seller"}
                   />
-
                   <PaySeller
                     paypalHandle={listing.user.paypalHandle ?? null}
                     venmoHandle={listing.user.venmoHandle ?? null}
@@ -221,9 +231,8 @@ export default async function ListingPage({
             </>
           )}
 
-          {/* Report button — only for logged-in non-owners */}
           {session?.user?.id && !isOwnListing && (
-            <div className="mt-4">
+            <div className="mt-1">
               <ReportButton listingId={listing.id} />
             </div>
           )}

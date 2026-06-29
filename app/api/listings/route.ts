@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
+import { HANDLING_TIMES, CARRIERS } from "@/lib/shipping";
+import type { Carrier } from "@prisma/client";
 
 const VALID_SIZES = ["A0", "A1", "A2", "A3", "A4", "A5", "A6"];
 const VALID_CONDITIONS = ["New", "Like New", "Good", "Worn"];
@@ -30,6 +32,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
+    // Core fields
     const brand = String(body.brand ?? "").trim().slice(0, 100);
     const size = String(body.size ?? "").trim();
     const condition = String(body.condition ?? "").trim();
@@ -46,6 +49,41 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Price must be between $1 and $10,000" }, { status: 400 });
     }
 
+    // Shipping fields
+    const pickupAvailable = Boolean(body.pickupAvailable);
+    const shippingAvailable = Boolean(body.shippingAvailable);
+
+    let shippingCost: number | null = null;
+    let shipsFromCity: string | null = null;
+    let shipsFromState: string | null = null;
+    let handlingTime: string | null = null;
+    let preferredCarrier: Carrier | null = null;
+
+    if (shippingAvailable) {
+      const rawCost = body.shippingCost;
+      if (rawCost !== null && rawCost !== undefined && rawCost !== "") {
+        shippingCost = parseFloat(rawCost);
+        if (!isFinite(shippingCost) || shippingCost < 0) {
+          return NextResponse.json({ error: "Shipping cost cannot be negative" }, { status: 400 });
+        }
+      }
+
+      shipsFromCity = String(body.shipsFromCity ?? "").trim().slice(0, 100);
+      shipsFromState = String(body.shipsFromState ?? "").trim();
+      handlingTime = String(body.handlingTime ?? "").trim();
+      const carrier = String(body.preferredCarrier ?? "").trim();
+
+      if (!shipsFromCity) return NextResponse.json({ error: "City is required when shipping is enabled" }, { status: 400 });
+      if (!shipsFromState) return NextResponse.json({ error: "State is required when shipping is enabled" }, { status: 400 });
+      if (!HANDLING_TIMES.includes(handlingTime as typeof HANDLING_TIMES[number])) {
+        return NextResponse.json({ error: "Invalid handling time" }, { status: 400 });
+      }
+      if (!CARRIERS.includes(carrier as Carrier)) {
+        return NextResponse.json({ error: "Invalid carrier" }, { status: 400 });
+      }
+      preferredCarrier = carrier as Carrier;
+    }
+
     const listing = await prisma.listing.create({
       data: {
         title: `${brand} ${size}`,
@@ -56,6 +94,13 @@ export async function POST(request: NextRequest) {
         description,
         images,
         userId: session.user.id,
+        pickupAvailable,
+        shippingAvailable,
+        shippingCost,
+        shipsFromCity,
+        shipsFromState,
+        handlingTime,
+        preferredCarrier,
       },
     });
 

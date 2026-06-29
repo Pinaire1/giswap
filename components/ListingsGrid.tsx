@@ -6,7 +6,11 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Heart } from "lucide-react";
+import { Heart, SearchX } from "lucide-react";
+import {
+  applyListingSearchUpdates,
+  listingsBrowsePath,
+} from "@/lib/listings-search";
 import MessageSeller from "@/components/messageseller";
 
 type Listing = {
@@ -73,10 +77,12 @@ export default function ListingsGrid({
   listings,
   page = 0,
   totalPages = 1,
+  hasFilters = false,
 }: {
   listings: Listing[];
   page?: number;
   totalPages?: number;
+  hasFilters?: boolean;
 }) {
   const { data: session } = useSession();
   const router = useRouter();
@@ -84,21 +90,44 @@ export default function ListingsGrid({
   const [messagingListing, setMessagingListing] = useState<Listing | null>(null);
 
   const pageHref = (p: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (p === 0) params.delete("page");
-    else params.set("page", String(p));
-    const qs = params.toString();
-    return `/listings${qs ? `?${qs}` : ""}`;
+    const params = applyListingSearchUpdates(
+      searchParams,
+      { page: p === 0 ? "" : String(p) },
+      { resetPage: false },
+    );
+    return listingsBrowsePath(params);
   };
 
   return (
     <>
       {listings.length === 0 ? (
-        <div className="text-center py-20">
-          <p className="text-2xl text-gray-600">No gis match your filters.</p>
-          <Link href="/listings" className="mt-4 inline-block text-blue-400 hover:text-blue-300 text-sm transition">
-            Clear filters
-          </Link>
+        <div className="text-center py-20 px-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#111] border border-[#1e2a4a] mb-6">
+            <SearchX size={28} className="text-gray-600" aria-hidden />
+          </div>
+          <p className="text-2xl font-bold text-gray-400 mb-2">
+            {hasFilters ? "No gis match your search" : "No gis listed yet"}
+          </p>
+          <p className="text-gray-600 text-sm max-w-md mx-auto mb-6">
+            {hasFilters
+              ? "Try adjusting your filters, broadening your title search, or clearing everything to browse all listings."
+              : "Be the first to list a gi on the mat."}
+          </p>
+          {hasFilters ? (
+            <Link
+              href="/listings"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-700 hover:bg-blue-600 text-white rounded-xl text-sm font-semibold transition"
+            >
+              Clear all filters
+            </Link>
+          ) : (
+            <Link
+              href="/listings/new"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-700 hover:bg-blue-600 text-white rounded-xl text-sm font-semibold transition"
+            >
+              Sell your gi
+            </Link>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">

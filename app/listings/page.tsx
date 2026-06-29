@@ -3,66 +3,26 @@ import { auth } from "@/auth";
 import ListingsGrid from "@/components/ListingsGrid";
 import FilterBar from "@/components/FilterBar";
 import { Suspense } from "react";
-import type { Prisma } from "@prisma/client";
+import {
+  parseListingSearchParams,
+  searchListings,
+  type ListingSearchParams,
+} from "@/lib/listings-search";
 
 export const dynamic = "force-dynamic";
 
 export default async function ListingsPage({
   searchParams,
 }: {
-  searchParams: Promise<{
-    page?: string;
-    q?: string;
-    size?: string;
-    condition?: string;
-    brand?: string;
-    minPrice?: string;
-    maxPrice?: string;
-  }>;
+  searchParams: Promise<ListingSearchParams>;
 }) {
-  const {
-    page: pageParam,
-    q,
-    size,
-    condition,
-    brand,
-    minPrice,
-    maxPrice,
-  } = await searchParams;
-
-  const page = Math.max(0, parseInt(pageParam ?? "0", 10) || 0);
-  const PAGE_SIZE = 24;
+  const raw = await searchParams;
+  const search = parseListingSearchParams(raw);
 
   const session = await auth();
 
-  const where: Prisma.ListingWhereInput = { isSold: false };
-
-  if (q) {
-    where.OR = [
-      { title: { contains: q, mode: "insensitive" } },
-      { brand: { contains: q, mode: "insensitive" } },
-    ];
-  }
-  if (size) where.size = size;
-  if (condition) where.condition = condition;
-  if (brand) where.brand = { contains: brand, mode: "insensitive" };
-  if (minPrice || maxPrice) {
-    where.price = {};
-    if (minPrice) (where.price as Prisma.DecimalFilter).gte = parseFloat(minPrice);
-    if (maxPrice) (where.price as Prisma.DecimalFilter).lte = parseFloat(maxPrice);
-  }
-
-  const [listings, total, saved] = await Promise.all([
-    prisma.listing.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      take: PAGE_SIZE,
-      skip: page * PAGE_SIZE,
-      include: {
-        user: { select: { id: true, name: true, email: true } },
-      },
-    }),
-    prisma.listing.count({ where }),
+  const [{ listings, total, totalPages }, saved] = await Promise.all([
+    searchListings(search),
     session?.user?.id
       ? prisma.savedListing.findMany({
           where: { userId: session.user.id },
@@ -81,8 +41,6 @@ export default async function ListingsPage({
     isSaved: savedIds.has(l.id),
   }));
 
-  const totalPages = Math.ceil(total / PAGE_SIZE);
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
       <div className="mb-8">
@@ -96,7 +54,12 @@ export default async function ListingsPage({
         <FilterBar total={total} />
       </Suspense>
 
-      <ListingsGrid listings={serialized} page={page} totalPages={totalPages} />
+      <ListingsGrid
+        listings={serialized}
+        page={search.page}
+        totalPages={totalPages}
+        hasFilters={search.hasFilters}
+      />
     </div>
   );
 }

@@ -42,7 +42,7 @@ export default function Navbar() {
       <div className="belt-gradient h-0.5 w-full opacity-70" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between gap-4 h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 font-bold text-2xl text-white">
             <Shirt className="w-8 h-8 text-blue-500" />
@@ -50,7 +50,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-4 lg:gap-8">
+          <div className="hidden lg:flex items-center gap-4 lg:gap-8">
             {NAV_LINKS.map(({ href, label }) => (
               <Link key={href} href={href} className={linkClass(href)}>
                 {label}
@@ -62,7 +62,7 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Auth + Profile */}
-          <div className="hidden md:flex items-center gap-2 lg:gap-4">
+          <div className="hidden lg:flex items-center gap-2 lg:gap-4">
             {status === "loading" ? (
               <div className="text-gray-500 text-sm">Loading...</div>
             ) : session ? (
@@ -126,7 +126,7 @@ export default function Navbar() {
             aria-label={isOpen ? "Close menu" : "Open menu"}
             aria-expanded={isOpen}
             aria-controls="mobile-menu"
-            className="md:hidden text-white text-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded w-11 h-11 flex items-center justify-center"
+            className="lg:hidden text-white text-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded w-11 h-11 flex items-center justify-center"
           >
             {isOpen ? "✕" : "☰"}
           </button>
@@ -134,7 +134,7 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div id="mobile-menu" className="md:hidden py-4 border-t border-[#1e2a4a]">
+          <div id="mobile-menu" className="lg:hidden py-4 border-t border-[#1e2a4a]">
             <div className="flex flex-col text-base">
               {NAV_LINKS.map(({ href, label }) => (
                 <Link
